@@ -1,25 +1,31 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+
+import { GlobalStyle } from "./global";
+
+import styles from './App.module.css';
+
+import { Rotas } from './rotas/Rotas';
 
 function App() {
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <div className={styles.conteudo}>
+
+        <main className={styles.main}>
+          <div className={styles.grid}>
+            <Rotas />
+          </div>
+        </main>
+
+        <footer className={styles.rodape}>
+          app.gestaopessoal
+          <span className={styles.logo}>
+            <img src="/favicon.png" alt="logo" width={16} height={16} />
+          </span>
+        </footer>
+      </div>
+      <GlobalStyle />
+    </>
   );
 }
 
