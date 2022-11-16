@@ -10,7 +10,7 @@ interface TotalFatura {
 
 export function CardFatura({ totalFatura }: TotalFatura) {
 
-  const { atualizarFaturaAtivada } = useTotalFatura();
+  const { atualizarFaturaAtivada, todasFaturasSelecionadas } = useTotalFatura();
   const [ativo, setAtivo] = useState(false);
 
   function handleSelecionarFatura(totalFatura: ITotalFatura) {
@@ -20,7 +20,7 @@ export function CardFatura({ totalFatura }: TotalFatura) {
 
   return (
     <Container
-      ativo={ativo}
+      ativo={todasFaturasSelecionadas || ativo}
       atual={totalFatura.atual}
       fechada={totalFatura.fechada}
       onClick={() => { handleSelecionarFatura(totalFatura) }}>

@@ -20,8 +20,12 @@ interface TotalFaturaContextData {
   atualizarTransacoesPorTotalFatura: (totalFatura: ITotalFatura) => void;
   atualizarTransacoesPorTotalFaturaSnapshot: (idTotalFatura: string) => void;
   buscarTransacoesPorFaturas: () => void;
+  atualizarFaturasSelecionadas: (totalFaturas: ITotalFatura[], selecionarTodasFaturas: boolean) => void;
   faturasSelecionadas: ITotalFatura[];
+  faturasNaoSelecionadas: ITotalFatura[];
   transacoesPorTotalFatura: ITotalFatura[];
+  valorTotalFaturasSelecionadas: number;
+  todasFaturasSelecionadas: boolean;
   loading: boolean;
 }
 
@@ -32,26 +36,19 @@ const TotalFaturaContext = createContext<TotalFaturaContextData>(
 export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
 
   const [faturasSelecionadas, setFaturasSelecionadas] = useState<ITotalFatura[]>([]);
+  const [faturasNaoSelecionadas, setFaturasNaoSelecionadas] = useState<ITotalFatura[]>([]);
+  const [todasFaturasSelecionadas, setTodasFaturasSelecionadas] = useState(false);
 
   const [transacoesPorTotalFatura, setTransacoesPorTotalFatura] = useState<ITotalFatura[]>([]);
   const [transacoesPorTotalFaturaSnapshot, setTransacoesPorTotalFaturaSnapshot] = useState<ITotalFatura[]>([]);
+
+  const [valorTotalFaturasSelecionadas, setValorTotalFaturasSelecionadas] = useState(0);
 
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     buscarTransacoesPorFaturas()
   }, [faturasSelecionadas]);
-
-
-  function atualizarFaturaAtivada(totalFatura: ITotalFatura, adicionarTotalFatura: boolean) {
-
-    if (adicionarTotalFatura)
-      setFaturasSelecionadas([...faturasSelecionadas, totalFatura]);
-    else {
-      const array = faturasSelecionadas.filter(fs => fs.id !== totalFatura.id);
-      setFaturasSelecionadas(array);
-    }
-  }
 
   async function buscarTransacoesPorFaturas() {
     try {
@@ -65,6 +62,61 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
     catch (error) {
       setLoading(false);
     }
+  }
+
+  function atualizarFaturasSelecionadas(totalFatura: ITotalFatura[], selecionarTodasFaturas: boolean) {
+    if (selecionarTodasFaturas) {
+      setFaturasSelecionadas(totalFatura);
+      setValorTotalFaturasSelecionadas(CalcularTotalFaturasSelecionadas(totalFatura));
+    }
+    else {
+      setFaturasSelecionadas([]);
+      setValorTotalFaturasSelecionadas(CalcularTotalFaturasSelecionadas([]));
+    }
+    setTodasFaturasSelecionadas(selecionarTodasFaturas);
+    atualizarFaturasNaoSelecionadas();
+  }
+
+  function atualizarFaturaAtivada(totalFatura: ITotalFatura, adicionarTotalFatura: boolean) {
+
+    let array: ITotalFatura[];
+
+    if (adicionarTotalFatura) {
+      array = Object.values(faturasSelecionadas);
+      array.push(totalFatura);
+      setFaturasSelecionadas([...faturasSelecionadas, totalFatura]);
+    }
+    else {
+      array = faturasSelecionadas.filter(fs => fs.id !== totalFatura.id);
+      setFaturasSelecionadas(array);
+    }
+    setValorTotalFaturasSelecionadas(CalcularTotalFaturasSelecionadas(array));
+    atualizarFaturasNaoSelecionadas();
+  }
+
+  function atualizarFaturasNaoSelecionadas() {
+    if (faturasSelecionadas.length > 0) {
+      let novoArrayFaturasNaoSelecionadas: ITotalFatura[] = [];
+
+      for (var idx = 0; transacoesPorTotalFatura.length - 1; idx++) {
+        const transacaoFatura = faturasSelecionadas.filter(tf => tf.id !== transacoesPorTotalFatura[idx].id)[0];
+        if (transacaoFatura)
+          novoArrayFaturasNaoSelecionadas.push(transacaoFatura);
+      }
+      setFaturasNaoSelecionadas(novoArrayFaturasNaoSelecionadas);
+    }
+    else
+      setFaturasNaoSelecionadas([]);
+  }
+
+  function CalcularTotalFaturasSelecionadas(array: ITotalFatura[]) {
+    let valorTotal = 0;
+    if (array != null && array != undefined && array.length > 0) {
+      for (var idx = 0; idx <= array.length - 1; idx++) {
+        valorTotal += array[idx].valor;
+      }
+    }
+    return valorTotal;
   }
 
   function atualizarTotalFatura(totalFaturas: ITotalFatura[]) {
@@ -121,8 +173,12 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
         atualizarTransacoesPorTotalFaturaSnapshot,
         atualizarTotalFatura,
         buscarTransacoesPorFaturas,
+        atualizarFaturasSelecionadas,
         faturasSelecionadas,
+        faturasNaoSelecionadas,
         transacoesPorTotalFatura,
+        valorTotalFaturasSelecionadas,
+        todasFaturasSelecionadas,
         loading
       }}
     >

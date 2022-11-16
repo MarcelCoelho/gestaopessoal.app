@@ -16,6 +16,7 @@ export const GlobalStyle = createGlobalStyle`
     --red-tomato: #FF6347;
     --black: #000;
     --cinza: gray;
+    --fundoCard: #d8dce4;
   }
   
   * {

@@ -5,10 +5,13 @@ interface containerProps {
   faturaFechada: boolean;
 }
 
-export const Container = styled.div<containerProps>`
-  display: grid;
+export const Container = styled.div`
 
-  
+`;
+
+
+export const ConteudoTransacao = styled.div<containerProps>`
+  display: grid;  
 
   border-radius: 0.2rem;
   
@@ -106,4 +109,11 @@ export const Divisoria = styled.div`
 
 export const Conteudo = styled.div`
   padding: 1.5rem;
+`;
+
+export const NovaTransacao = styled.div`
+  background-color: var(--fundoCard);
+  height: auto;
+  margin: 1rem;
+  border-radius: 1rem;
 `;

@@ -5,18 +5,92 @@ export const Container = styled.div`
   flex-direction: column;
   flex-wrap: wrap;
   justify-content: center;
+  align-items: center;
+
+  border-radius: 0.4rem;
+  
+
+  background: var(--fundoCard);
+`;
+
+export const Cabecalho = styled.div`
+  display: flex;
+  
+  height: 70px;
+  width: 100%;
+
+  justify-content: space-between;
+  align-items: center;  
+
+  padding: 0.8rem;
+  border-bottom: 3px solid var(--text-body);
+
+  .enviarTodasFaturas {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+    max-height: 100%;
+
+    gap: 1rem;
+
+    p {
+      height: 80%;
+    }
+
+    span {
+      height: 20%;
+      font-size: 0.7rem;
+    }
+  }
+
+  .totalFaturasSelecionadas {
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    max-height: 100%;
+
+    gap: 1rem;
+
+    p {
+      font-size: 1.2rem;
+      font-weight: bold;
+      height: 80%;
+    }
+
+    span {
+      
+      height: 20%;
+      font-size: 0.7rem;
+    }
+  }
 `;
 
 export const Faturas = styled.div`
+ 
   display: flex;
   flex-wrap: wrap;
+  
+  justify-content: center;
+  align-items: center;
 `;
 
-export const Botao = styled.div`
-   button {
-   
-    width: 80%;
-    height: 3rem;
+export const Rodape = styled.div`
+  display: flex;
+  height: 5rem;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.5rem;
+  width: 100%;
+
+  button {   
+    
+    width: 100%;
+    height: 100%;
     border: none;
     background: var(--green-light);
     font-size:1rem;
