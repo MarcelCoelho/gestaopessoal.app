@@ -6,7 +6,7 @@ import { Container } from "./styles";
 
 export function TotalFaturaNaoSelecionada() {
 
-  const { faturasSelecionadas, atualizarFaturaAtivada } = useTotalFatura();
+  const { faturasSelecionadas, atualizarFaturaAtivada, atualizarTransacoesPorTotalFatura } = useTotalFatura();
 
   const [totalFaturaNaoSelecionada, setTotalFaturaNaoSelecionada] = useState<ITotalFatura[]>();
 
@@ -26,6 +26,7 @@ export function TotalFaturaNaoSelecionada() {
   };
 
   function handleAdicionarTotalFatura(totalFatura: ITotalFatura) {
+    atualizarTransacoesPorTotalFatura(totalFatura);
     atualizarFaturaAtivada(totalFatura, true);
   }
 

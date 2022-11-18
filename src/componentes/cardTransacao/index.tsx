@@ -1,6 +1,7 @@
 import { ITransacao } from "../../tipos";
 import { Container, Grid, Info } from "./styles";
 import { FiInfo, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { useTotalFatura } from "../../hooks/useTotalFatura";
 
 interface CardTransacaoProps {
   transacao: ITransacao;
@@ -10,21 +11,27 @@ interface CardTransacaoProps {
 
 export function CardTransacao({ transacao, faturaAtual, faturaFechada }: CardTransacaoProps) {
 
+  const { excluirTransacao } = useTotalFatura();
+
   async function handleExibirInfo(id: string) {
     const divInfo = document.getElementById(id);
-    divInfo.setAttribute("style", "visibility: visible");
+    divInfo?.setAttribute("style", "visibility: visible");
 
     await new Promise(sl => setTimeout(sl, 5000));
-    divInfo.setAttribute("style", "visibility: hidden");
+    divInfo?.setAttribute("style", "visibility: hidden");
   }
 
   function handleFecharInfo(id: string) {
     const divInfo = document.getElementById(id);
-    divInfo.setAttribute("style", "visibility: hidden");
+    divInfo?.setAttribute("style", "visibility: hidden");
   }
 
   function handleEditar(id: string) {
     alert('editar' + id);
+  }
+
+  function handleExcluir(idFatura: string, idTransacao: string) {
+    excluirTransacao(idFatura, idTransacao);
   }
 
   return (
@@ -51,7 +58,7 @@ export function CardTransacao({ transacao, faturaAtual, faturaFechada }: CardTra
         <div className="editar" onClick={() => handleEditar(transacao.id)}>
           <FiEdit2 size="16" />
         </div>
-        <div className="excluir">
+        <div className="excluir" onClick={() => handleExcluir(transacao.faturaId, transacao.id)}>
           <FiTrash2 size="18" />
         </div>
       </Grid>

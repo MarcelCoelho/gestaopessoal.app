@@ -2,7 +2,11 @@ import ReactLoading from 'react-loading';
 
 import { Container } from "./styles";
 
-export function Loading({ descricao }) {
+interface LoadingProps {
+  descricao: string;
+}
+
+export function Loading({ descricao }: LoadingProps) {
   return (
     <Container>
       <ReactLoading

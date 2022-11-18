@@ -3,11 +3,11 @@ import { useState } from "react";
 import { useTotalFatura } from "../../hooks/useTotalFatura";
 import { ITotalFatura, } from "../../tipos";
 import { CardTransacao } from "../cardTransacao";
-import { Container, ConteudoTransacao, Cabecalho, Conteudo, NovaTransacao } from "./styles";
+import { Container, ConteudoTransacao, Cabecalho, Conteudo } from "./styles";
 import { FiChevronRight, FiChevronDown } from 'react-icons/fi';
 import { Loading } from "../loading";
 import { Pesquisar } from "../pesquisar";
-import { TotalFaturaNaoSelecionada } from "../totalFaturaNaoSelecionada";
+import { Compare, GravarDadosLocalStorage } from "../../Servicos/utilidades";
 
 interface IVisibilidadeTotalFatura {
   faturaID: string;
@@ -19,15 +19,22 @@ export function Transacao() {
   const {
     atualizarTotalFatura,
     transacoesPorTotalFatura,
-    faturasNaoSelecionadas,
     loading } = useTotalFatura();
 
   const [visibilidadeTotalFatura, setVisibilidadeTotalFatura] = useState<IVisibilidadeTotalFatura[]>([]);
-
+  const [totalFatura, setTotalFatura] = useState<ITotalFatura[]>([]);
 
   useEffect(() => {
-    console.log(faturasNaoSelecionadas);
-  }, [])
+
+    const totalFaturaLocalStorage = localStorage.getItem('totalFatura');
+
+    if (totalFaturaLocalStorage) {
+      const total: ITotalFatura[] = JSON.parse(totalFaturaLocalStorage);
+      setTotalFatura(total);
+    }
+
+    //setTotalFatura(transacoesPorTotalFatura);
+  }, [transacoesPorTotalFatura])
 
   function handleAlterarEstadoVisibilidadeTransacoes(id: string) {
     atualizarMostrarTransacoes(id);
@@ -68,25 +75,25 @@ export function Transacao() {
   function atualizarEstiloComponente(visible: boolean, id: string) {
     if (visible) {
       var divContainer = document.getElementById('container_' + id);
-      divContainer.setAttribute("style", "height: auto");
+      divContainer?.setAttribute("style", "height: auto");
 
       var divConteudo = document.getElementById('conteudo_' + id);
-      divConteudo.setAttribute("style", "visibility: visible");
+      divConteudo?.setAttribute("style", "visibility: visible");
 
     }
     else {
       var divContainer = document.getElementById('container_' + id);
-      divContainer.setAttribute("style", "height: 4rem");
+      divContainer?.setAttribute("style", "height: 4rem");
 
       var divConteudo = document.getElementById('conteudo_' + id);
-      divConteudo.setAttribute("style", "visibility: hidden");
+      divConteudo?.setAttribute("style", "visibility: hidden");
 
     }
   }
 
   function atualizarMostrarTransacoes(id: string) {
 
-    let array = Object.values(transacoesPorTotalFatura);
+    let array = Object.values(totalFatura);
 
     let itemID = array.filter(vtf => vtf.id === id)[0];
     let itemIDClonado: ITotalFatura = JSON.parse(JSON.stringify(itemID));
@@ -98,22 +105,14 @@ export function Transacao() {
       array.splice(indiceObjeto, 1);
 
     array.push(itemIDClonado);
-    array.sort(compare);
+    array.sort(Compare);
     atualizarTotalFatura(array);
+    setTotalFatura(array);
+    GravarDadosLocalStorage(array, 'totalFatura');
     //setTotalFaturas(array);
 
   }
 
-  function compare(array1, array2) {
-    if (array1.ordem < array2.ordem) {
-      return -1;
-    }
-    if (array1.ordem > array2.ordem) {
-      return 1;
-    }
-    return 0;
-  }
-  const items = transacoesPorTotalFatura;
   return (
     <>
       {loading ? (
@@ -121,8 +120,8 @@ export function Transacao() {
       ) : (
         <>
           <Container>
-            {transacoesPorTotalFatura && (
-              transacoesPorTotalFatura.map(totalFatura => (
+            {totalFatura && (
+              totalFatura.map(totalFatura => (
                 <ConteudoTransacao
                   key={totalFatura.id}
                   id={"container_" + totalFatura.id}
@@ -185,9 +184,9 @@ export function Transacao() {
                 </ConteudoTransacao>
               )))}
 
-            <NovaTransacao>
+            {/* <NovaTransacao>
               <TotalFaturaNaoSelecionada />
-            </NovaTransacao>
+                      </NovaTransacao>*/}
           </Container>
         </>
       )}

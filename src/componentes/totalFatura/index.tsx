@@ -13,12 +13,11 @@ import { Container, Cabecalho, Faturas, Rodape } from "./styles";
 
 export function TotalFatura() {
 
-  const [totalPorFatura, setTotalPorFatura] = useState<ITotalFatura[]>();
+  const [totalPorFatura, setTotalPorFatura] = useState<ITotalFatura[]>([]);
   const [enviarTodasFaturas, setEnviarTodasFaturas] = useState(false);
   const [carregando, setCarregando] = useState(false);
 
-  const { atualizarFaturaAtivada,
-    atualizarFaturasSelecionadas,
+  const { atualizarFaturasSelecionadas,
     faturasSelecionadas,
     valorTotalFaturasSelecionadas } = useTotalFatura();
 

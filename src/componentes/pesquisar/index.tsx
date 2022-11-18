@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { KeyboardEvent, useState } from "react";
 import { useTotalFatura } from "../../hooks/useTotalFatura";
 import { ITotalFatura, ITransacao } from "../../tipos"
 import { Container } from "./styles";
@@ -12,7 +12,7 @@ export function Pesquisar({ totalFatura }: PesquisarProps) {
   const { atualizarTransacoesPorTotalFatura, atualizarTransacoesPorTotalFaturaSnapshot } = useTotalFatura();
   const [parametrosPesquisa, setParametrosPesquisa] = useState("");
 
-  function handleKeypress(e) {
+  function handleKeypress(e: KeyboardEvent) {
     if (e.key === 'Enter') {
       handlePesquisar();
     }

@@ -8,7 +8,10 @@ import {
   useContext,
 } from "react";
 import { api } from '../Servicos/api';
+import { CalcularTotalFatura, Compare, GravarDadosLocalStorage } from '../Servicos/utilidades';
 import { ITotalFatura } from '../tipos';
+
+//import Cookies from 'js-cookie';
 
 interface TotalFaturaProviderProps {
   children: ReactNode;
@@ -21,8 +24,8 @@ interface TotalFaturaContextData {
   atualizarTransacoesPorTotalFaturaSnapshot: (idTotalFatura: string) => void;
   buscarTransacoesPorFaturas: () => void;
   atualizarFaturasSelecionadas: (totalFaturas: ITotalFatura[], selecionarTodasFaturas: boolean) => void;
+  excluirTransacao: (idFatura: string, idTransacao: string) => void;
   faturasSelecionadas: ITotalFatura[];
-  faturasNaoSelecionadas: ITotalFatura[];
   transacoesPorTotalFatura: ITotalFatura[];
   valorTotalFaturasSelecionadas: number;
   todasFaturasSelecionadas: boolean;
@@ -36,7 +39,6 @@ const TotalFaturaContext = createContext<TotalFaturaContextData>(
 export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
 
   const [faturasSelecionadas, setFaturasSelecionadas] = useState<ITotalFatura[]>([]);
-  const [faturasNaoSelecionadas, setFaturasNaoSelecionadas] = useState<ITotalFatura[]>([]);
   const [todasFaturasSelecionadas, setTodasFaturasSelecionadas] = useState(false);
 
   const [transacoesPorTotalFatura, setTransacoesPorTotalFatura] = useState<ITotalFatura[]>([]);
@@ -53,11 +55,28 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
   async function buscarTransacoesPorFaturas() {
     try {
       setLoading(true);
-      const ids = faturasSelecionadas.map(fs => fs.id);
-      const response = await api.post<ITotalFatura[]>("/api/transacao/TransacoesPorFaturas", ids);
-      setTransacoesPorTotalFatura(response.data);
-      setTransacoesPorTotalFaturaSnapshot(response.data);
-      setLoading(false);
+
+      if (faturasSelecionadas.length === 0) {
+        const faturasSelecionadasLocalStorage = localStorage.getItem('faturasSelecionadas');
+
+        if (faturasSelecionadasLocalStorage) {
+          const faturasSeleciondasConvertido: ITotalFatura[] = JSON.parse(faturasSelecionadasLocalStorage);
+          setFaturasSelecionadas(faturasSeleciondasConvertido);
+        }
+      }
+      else {
+
+        const ids = faturasSelecionadas.map(fs => fs.id);
+        const response = await api.post<ITotalFatura[]>("/api/transacao/TransacoesPorFaturas", ids);
+        setTransacoesPorTotalFatura(response.data);
+        setTransacoesPorTotalFaturaSnapshot(response.data);
+
+        console.log(JSON.stringify(response.data));
+
+        GravarDadosLocalStorage(response.data, 'totalFatura');
+
+        setLoading(false);
+      }
     }
     catch (error) {
       setLoading(false);
@@ -68,13 +87,14 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
     if (selecionarTodasFaturas) {
       setFaturasSelecionadas(totalFatura);
       setValorTotalFaturasSelecionadas(CalcularTotalFaturasSelecionadas(totalFatura));
+      GravarDadosLocalStorage(totalFatura, 'faturasSelecionadas');
     }
     else {
       setFaturasSelecionadas([]);
       setValorTotalFaturasSelecionadas(CalcularTotalFaturasSelecionadas([]));
+      GravarDadosLocalStorage([], 'faturasSelecionadas');
     }
     setTodasFaturasSelecionadas(selecionarTodasFaturas);
-    atualizarFaturasNaoSelecionadas();
   }
 
   function atualizarFaturaAtivada(totalFatura: ITotalFatura, adicionarTotalFatura: boolean) {
@@ -90,23 +110,9 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
       array = faturasSelecionadas.filter(fs => fs.id !== totalFatura.id);
       setFaturasSelecionadas(array);
     }
+
     setValorTotalFaturasSelecionadas(CalcularTotalFaturasSelecionadas(array));
-    atualizarFaturasNaoSelecionadas();
-  }
-
-  function atualizarFaturasNaoSelecionadas() {
-    if (faturasSelecionadas.length > 0) {
-      let novoArrayFaturasNaoSelecionadas: ITotalFatura[] = [];
-
-      for (var idx = 0; transacoesPorTotalFatura.length - 1; idx++) {
-        const transacaoFatura = faturasSelecionadas.filter(tf => tf.id !== transacoesPorTotalFatura[idx].id)[0];
-        if (transacaoFatura)
-          novoArrayFaturasNaoSelecionadas.push(transacaoFatura);
-      }
-      setFaturasNaoSelecionadas(novoArrayFaturasNaoSelecionadas);
-    }
-    else
-      setFaturasNaoSelecionadas([]);
+    GravarDadosLocalStorage(array, 'faturasSelecionadas');
   }
 
   function CalcularTotalFaturasSelecionadas(array: ITotalFatura[]) {
@@ -122,6 +128,7 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
   function atualizarTotalFatura(totalFaturas: ITotalFatura[]) {
     setTransacoesPorTotalFatura(totalFaturas);
   }
+
   function atualizarTransacoesPorTotalFatura(totalFatura: ITotalFatura) {
     // remove item que foi alterado da lista original e depois atualiza a lista original com novo item alterado
     let arrayClonado = Object.values(transacoesPorTotalFatura);
@@ -129,8 +136,9 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
 
     arrayClonado.push(totalFatura);
 
-    arrayClonado.sort(compare);
+    arrayClonado.sort(Compare);
 
+    GravarDadosLocalStorage(arrayClonado, 'totalFatura');
     setTransacoesPorTotalFatura(arrayClonado);
   }
 
@@ -150,19 +158,83 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
 
     arrayClonado.push(totalFaturaFiltrado);
 
-    arrayClonado.sort(compare);
+    arrayClonado.sort(Compare);
 
     setTransacoesPorTotalFatura(arrayClonado);
+    GravarDadosLocalStorage(arrayClonado, 'totalFatura');
   }
 
-  function compare(array1, array2) {
-    if (array1.ordem < array2.ordem) {
-      return -1;
+
+
+  async function excluirTransacao(idFatura: string, idTransacao: string) {
+    try {
+      if (window.confirm('Tem certeza que deseja remover?')) {
+        await api.delete<ITotalFatura[]>(`/api/transacao/${idTransacao}`);
+        removerTransacaoDaListaTransacoesPorTotalFatura(idFatura, idTransacao);
+      }
     }
-    if (array1.ordem > array2.ordem) {
-      return 1;
+    catch (error) {
+      console.log(error);
     }
-    return 0;
+  }
+
+  function removerTransacaoDaListaTransacoesPorTotalFatura(idFatura: string, idTransacao: string) {
+
+    let totalFaturasClonado = Object.values(transacoesPorTotalFatura);
+    const totalFaturaClonado = totalFaturasClonado.filter(t => t.id === idFatura)[0];
+    if (totalFaturaClonado) {
+
+      const transacao = totalFaturaClonado.transacoes.filter(t => t.id === idTransacao)[0];
+      if (transacao) {
+
+        const indiceTransacao = totalFaturaClonado.transacoes.indexOf(transacao);
+        if (indiceTransacao > -1)
+          totalFaturaClonado.transacoes.splice(indiceTransacao, 1);
+
+        const indiceTotalFatura = totalFaturasClonado.indexOf(totalFaturaClonado);
+        if (indiceTotalFatura > -1)
+          totalFaturasClonado.splice(indiceTotalFatura, 1);
+
+        totalFaturaClonado.quantidadeTransacoes = totalFaturaClonado.transacoes.length;
+        totalFaturaClonado.valor = CalcularTotalFatura(totalFaturaClonado.transacoes);
+
+        totalFaturasClonado.push(totalFaturaClonado);
+        totalFaturasClonado.sort(Compare);
+
+        GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
+        setTransacoesPorTotalFatura(totalFaturasClonado);
+
+        removerTransacaoDaListaTransacoesPorTotalFaturaSnapshot(idFatura, idTransacao);
+
+      }
+    }
+  }
+
+  function removerTransacaoDaListaTransacoesPorTotalFaturaSnapshot(idFatura: string, idTransacao: string) {
+    let totalFaturasClonado = Object.values(transacoesPorTotalFaturaSnapshot);
+    const totalFaturaClonado = totalFaturasClonado.filter(t => t.id === idFatura)[0];
+    if (totalFaturaClonado) {
+
+      const transacao = totalFaturaClonado.transacoes.filter(t => t.id === idTransacao)[0];
+      if (transacao) {
+
+        const indiceTransacao = totalFaturaClonado.transacoes.indexOf(transacao);
+        if (indiceTransacao > -1)
+          totalFaturaClonado.transacoes.splice(indiceTransacao, 1);
+
+        const indiceTotalFatura = totalFaturasClonado.indexOf(totalFaturaClonado);
+        if (indiceTotalFatura > -1)
+          totalFaturasClonado.splice(indiceTotalFatura, 1);
+
+        totalFaturaClonado.quantidadeTransacoes = totalFaturaClonado.transacoes.length;
+        totalFaturaClonado.valor = CalcularTotalFatura(totalFaturaClonado.transacoes);
+
+        totalFaturasClonado.push(totalFaturaClonado);
+        totalFaturasClonado.sort(Compare);
+        setTransacoesPorTotalFaturaSnapshot(totalFaturasClonado);
+
+      }
+    }
   }
 
   return (
@@ -174,8 +246,8 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
         atualizarTotalFatura,
         buscarTransacoesPorFaturas,
         atualizarFaturasSelecionadas,
+        excluirTransacao,
         faturasSelecionadas,
-        faturasNaoSelecionadas,
         transacoesPorTotalFatura,
         valorTotalFaturasSelecionadas,
         todasFaturasSelecionadas,
