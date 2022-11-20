@@ -1,5 +1,6 @@
 import { KeyboardEvent, useState } from "react";
 import { useTotalFatura } from "../../hooks/useTotalFatura";
+import { CalcularTotalFatura } from "../../Servicos/utilidades";
 import { ITotalFatura, ITransacao } from "../../tipos"
 import { Container } from "./styles";
 
@@ -90,18 +91,6 @@ export function Pesquisar({ totalFatura }: PesquisarProps) {
         this.select();
       })
     }
-  }
-
-  function CalcularTotalFatura(transacoes: ITransacao[]) {
-    if (transacoes != null && transacoes != undefined && transacoes.length > 0) {
-      let valorTotal = 0;
-      for (var idx = 0; idx <= transacoes.length - 1; idx++) {
-        valorTotal += Number(transacoes[idx].valor);
-      }
-      return valorTotal;
-    }
-
-    return 0;
   }
 
   function indexOf(valor: string, filtroBusca: string) {

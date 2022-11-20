@@ -7,7 +7,8 @@ import { Container, ConteudoTransacao, Cabecalho, Conteudo } from "./styles";
 import { FiChevronRight, FiChevronDown } from 'react-icons/fi';
 import { Loading } from "../loading";
 import { Pesquisar } from "../pesquisar";
-import { Compare, GravarDadosLocalStorage } from "../../Servicos/utilidades";
+import { Ordenar, GravarDadosLocalStorage } from "../../Servicos/utilidades";
+import { CardTransacaoEditar } from "../cardTransacaoEditar";
 
 interface IVisibilidadeTotalFatura {
   faturaID: string;
@@ -105,7 +106,7 @@ export function Transacao() {
       array.splice(indiceObjeto, 1);
 
     array.push(itemIDClonado);
-    array.sort(Compare);
+    array.sort(Ordenar);
     atualizarTotalFatura(array);
     setTotalFatura(array);
     GravarDadosLocalStorage(array, 'totalFatura');
@@ -172,12 +173,22 @@ export function Transacao() {
                   <Conteudo id={"conteudo_" + totalFatura.id} style={{ visibility: "hidden" }}>
                     {totalFatura.transacoes && (
                       totalFatura.transacoes?.map((transacao) => (
-                        <CardTransacao
-                          key={transacao.id}
-                          transacao={transacao}
-                          faturaAtual={totalFatura.atual}
-                          faturaFechada={totalFatura.fechada}
-                        />
+
+                        <>
+                          {transacao.editando ? (
+                            <CardTransacaoEditar
+                              key={transacao.id}
+                              transacao={transacao}
+                            />
+                          ) : <CardTransacao
+                            key={transacao.id}
+                            transacao={transacao}
+                            faturaAtual={totalFatura.atual}
+                            faturaFechada={totalFatura.fechada}
+                          />
+                          }
+                        </>
+
                       ))
                     )}
                   </Conteudo>

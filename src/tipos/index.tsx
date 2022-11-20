@@ -30,6 +30,7 @@ export type ITransacao = {
   dataCriacao: Date;
   dataModificacao: Date;
   estaSelecionado: boolean;
+  editando: boolean;
 }
 
 export type ITotalFatura = {

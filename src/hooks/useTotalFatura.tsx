@@ -8,8 +8,8 @@ import {
   useContext,
 } from "react";
 import { api } from '../Servicos/api';
-import { CalcularTotalFatura, Compare, GravarDadosLocalStorage } from '../Servicos/utilidades';
-import { ITotalFatura } from '../tipos';
+import { CalcularTotalFatura, Ordenar, GravarDadosLocalStorage, OrdenarData } from '../Servicos/utilidades';
+import { ITotalFatura, ITransacao } from '../tipos';
 
 //import Cookies from 'js-cookie';
 
@@ -25,6 +25,7 @@ interface TotalFaturaContextData {
   buscarTransacoesPorFaturas: () => void;
   atualizarFaturasSelecionadas: (totalFaturas: ITotalFatura[], selecionarTodasFaturas: boolean) => void;
   excluirTransacao: (idFatura: string, idTransacao: string) => void;
+  modoEdicao: (transacao: ITransacao) => void;
   faturasSelecionadas: ITotalFatura[];
   transacoesPorTotalFatura: ITotalFatura[];
   valorTotalFaturasSelecionadas: number;
@@ -70,8 +71,6 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
         const response = await api.post<ITotalFatura[]>("/api/transacao/TransacoesPorFaturas", ids);
         setTransacoesPorTotalFatura(response.data);
         setTransacoesPorTotalFaturaSnapshot(response.data);
-
-        console.log(JSON.stringify(response.data));
 
         GravarDadosLocalStorage(response.data, 'totalFatura');
 
@@ -136,7 +135,7 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
 
     arrayClonado.push(totalFatura);
 
-    arrayClonado.sort(Compare);
+    arrayClonado.sort(Ordenar);
 
     GravarDadosLocalStorage(arrayClonado, 'totalFatura');
     setTransacoesPorTotalFatura(arrayClonado);
@@ -158,13 +157,11 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
 
     arrayClonado.push(totalFaturaFiltrado);
 
-    arrayClonado.sort(Compare);
+    arrayClonado.sort(Ordenar);
 
     setTransacoesPorTotalFatura(arrayClonado);
     GravarDadosLocalStorage(arrayClonado, 'totalFatura');
   }
-
-
 
   async function excluirTransacao(idFatura: string, idTransacao: string) {
     try {
@@ -199,7 +196,7 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
         totalFaturaClonado.valor = CalcularTotalFatura(totalFaturaClonado.transacoes);
 
         totalFaturasClonado.push(totalFaturaClonado);
-        totalFaturasClonado.sort(Compare);
+        totalFaturasClonado.sort(Ordenar);
 
         GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
         setTransacoesPorTotalFatura(totalFaturasClonado);
@@ -230,11 +227,54 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
         totalFaturaClonado.valor = CalcularTotalFatura(totalFaturaClonado.transacoes);
 
         totalFaturasClonado.push(totalFaturaClonado);
-        totalFaturasClonado.sort(Compare);
+        totalFaturasClonado.sort(Ordenar);
         setTransacoesPorTotalFaturaSnapshot(totalFaturasClonado);
 
       }
     }
+  }
+
+
+  function modoEdicao(transacao: ITransacao) {
+    transacao.editando = !transacao.editando;
+
+    const totalFaturaClonado = substituirTransacao(transacao);
+    const totalFaturasClonado = substituirTotalFatura(totalFaturaClonado);
+
+    GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
+    setTransacoesPorTotalFatura(totalFaturasClonado);
+
+  }
+
+  function substituirTransacao(transacao: ITransacao) {
+
+    let totalFaturasClonado = Object.values(transacoesPorTotalFatura);
+    const totalFaturaClonado = totalFaturasClonado.filter(t => t.id === transacao.faturaId)[0];
+    if (totalFaturaClonado) {
+
+      const transacaoClonada = totalFaturaClonado.transacoes.filter(t => t.id === transacao.id)[0];
+      if (transacaoClonada) {
+
+        const indiceTransacao = totalFaturaClonado.transacoes.indexOf(transacaoClonada);
+        if (indiceTransacao > -1) {
+          totalFaturaClonado.transacoes.splice(indiceTransacao, 1, transacao);
+          //totalFaturaClonado.transacoes.push(transacao);
+          //totalFaturaClonado.transacoes.sort(OrdenarData);
+        }
+      }
+    }
+    return totalFaturaClonado;
+  }
+
+  function substituirTotalFatura(totalFaturaClonado: ITotalFatura) {
+    let totalFaturasClonado = Object.values(transacoesPorTotalFatura);
+    const indiceTotalFatura = totalFaturasClonado.indexOf(totalFaturaClonado);
+    if (indiceTotalFatura > -1)
+      totalFaturasClonado.splice(indiceTotalFatura, 1);
+
+    totalFaturasClonado.push(totalFaturaClonado);
+    totalFaturasClonado.sort(Ordenar);
+    return totalFaturasClonado;
   }
 
   return (
@@ -247,6 +287,7 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
         buscarTransacoesPorFaturas,
         atualizarFaturasSelecionadas,
         excluirTransacao,
+        modoEdicao,
         faturasSelecionadas,
         transacoesPorTotalFatura,
         valorTotalFaturasSelecionadas,

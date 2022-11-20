@@ -7,11 +7,21 @@ export const GravarDadosLocalStorage = (array: ITotalFatura[], nome: string) => 
     localStorage.removeItem(nome);
 }
 
-export const Compare = (array1: ITotalFatura, array2: ITotalFatura) => {
+export const Ordenar = (array1: ITotalFatura, array2: ITotalFatura) => {
   if (array1.ordem < array2.ordem) {
     return -1;
   }
   if (array1.ordem > array2.ordem) {
+    return 1;
+  }
+  return 0;
+}
+
+export const OrdenarData = (array1: ITransacao, array2: ITransacao) => {
+  if (new Date(array1.dataCriacao) < new Date(array2.dataCriacao)) {
+    return -1;
+  }
+  if (new Date(array1.dataCriacao) > new Date(array2.dataCriacao)) {
     return 1;
   }
   return 0;

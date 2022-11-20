@@ -11,7 +11,8 @@ interface CardTransacaoProps {
 
 export function CardTransacao({ transacao, faturaAtual, faturaFechada }: CardTransacaoProps) {
 
-  const { excluirTransacao } = useTotalFatura();
+
+  const { excluirTransacao, modoEdicao } = useTotalFatura();
 
   async function handleExibirInfo(id: string) {
     const divInfo = document.getElementById(id);
@@ -27,7 +28,7 @@ export function CardTransacao({ transacao, faturaAtual, faturaFechada }: CardTra
   }
 
   function handleEditar(id: string) {
-    alert('editar' + id);
+    modoEdicao(transacao);
   }
 
   function handleExcluir(idFatura: string, idTransacao: string) {

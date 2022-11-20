@@ -27,7 +27,6 @@ const TransacoesContext = createContext<TransacoesContextData>(
 export function TransacoesProvider({ children }: TransacaoProviderProps) {
 
   const [transacoes, setTransacoes] = useState<ITransacao[]>([]);
-  const [faturaAtivada, setFaturaAtivada] = useState("");
 
   useEffect(() => {
     buscarTransacoes();
@@ -43,10 +42,6 @@ export function TransacoesProvider({ children }: TransacaoProviderProps) {
     catch (error) {
 
     }
-  }
-
-  function AtualizarFaturaAtivada(id: string) {
-    setFaturaAtivada(id);
   }
 
   return (
