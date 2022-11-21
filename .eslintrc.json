@@ -17,19 +17,9 @@
     "plugins": [
         "react",
         "react-hooks",
-        "import",
         "@typescript-eslint"
     ],
     "rules": {
-        "react/jsx-filename-extension": [
-            "error",
-            {
-                "extensions": [
-                    ".js",
-                    ".jsx"
-                ]
-            }
-        ],
         "react-hooks/rules-of-hooks": "error",
         "react-hooks/exhaustive-deps": "off"
     }
