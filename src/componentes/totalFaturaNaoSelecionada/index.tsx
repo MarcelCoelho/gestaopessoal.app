@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useTotalFatura } from "../../hooks/useTotalFatura";
+import { useTransacoes } from "../../hooks/useTransacoes";
 import { api } from "../../Servicos/api";
 import { ITotalFatura } from "../../tipos";
 import { Container } from "./styles";
 
 export function TotalFaturaNaoSelecionada() {
 
-  const { faturasSelecionadas, atualizarFaturaAtivada, atualizarTransacoesPorTotalFatura } = useTotalFatura();
-
+  const { faturasSelecionadas, atualizarFaturaAtivada } = useTotalFatura();
+  const { atualizarTransacoesPorTotalFatura } = useTransacoes();
   const [totalFaturaNaoSelecionada, setTotalFaturaNaoSelecionada] = useState<ITotalFatura[]>();
 
   useEffect(() => {

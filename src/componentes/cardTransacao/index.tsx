@@ -1,7 +1,7 @@
 import { ITransacao } from "../../tipos";
 import { Container, Grid, Info } from "./styles";
 import { FiInfo, FiEdit2, FiTrash2 } from 'react-icons/fi';
-import { useTotalFatura } from "../../hooks/useTotalFatura";
+import { useTransacoes } from "../../hooks/useTransacoes";
 
 interface CardTransacaoProps {
   transacao: ITransacao;
@@ -12,7 +12,7 @@ interface CardTransacaoProps {
 export function CardTransacao({ transacao, faturaAtual, faturaFechada }: CardTransacaoProps) {
 
 
-  const { excluirTransacao, modoEdicao } = useTotalFatura();
+  const { excluirTransacao, modoEdicao } = useTransacoes();
 
   async function handleExibirInfo(id: string) {
     const divInfo = document.getElementById(id);

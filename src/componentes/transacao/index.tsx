@@ -9,6 +9,7 @@ import { Loading } from "../loading";
 import { Pesquisar } from "../pesquisar";
 import { Ordenar, GravarDadosLocalStorage } from "../../Servicos/utilidades";
 import { CardTransacaoEditar } from "../cardTransacaoEditar";
+import { useTransacoes } from "../../hooks/useTransacoes";
 
 interface IVisibilidadeTotalFatura {
   faturaID: string;
@@ -18,9 +19,11 @@ interface IVisibilidadeTotalFatura {
 export function Transacao() {
 
   const {
-    atualizarTotalFatura,
-    transacoesPorTotalFatura,
-    loading } = useTotalFatura();
+    buscarTransacoesTotalFatura,
+    atualizarTransacoesTotalFatura,
+    transacoesTotalFatura,
+    loading
+  } = useTransacoes();
 
   const [visibilidadeTotalFatura, setVisibilidadeTotalFatura] = useState<IVisibilidadeTotalFatura[]>([]);
   const [totalFatura, setTotalFatura] = useState<ITotalFatura[]>([]);
@@ -34,7 +37,22 @@ export function Transacao() {
       setTotalFatura(total);
     }
 
-  }, [transacoesPorTotalFatura])
+    buscarTransacoes();
+
+  }, [])
+
+  useEffect(() => {
+
+    if (transacoesTotalFatura)
+      setTotalFatura(transacoesTotalFatura);
+
+  }, [transacoesTotalFatura])
+
+  const buscarTransacoes = async () => {
+    const transacoesTotalFatura = await buscarTransacoesTotalFatura();
+    if (transacoesTotalFatura)
+      setTotalFatura(transacoesTotalFatura);
+  }
 
   function handleAlterarEstadoVisibilidadeTransacoes(id: string) {
     atualizarMostrarTransacoes(id);
@@ -109,11 +127,9 @@ export function Transacao() {
 
     array.push(itemIDClonado);
     array.sort(Ordenar);
-    atualizarTotalFatura(array);
+    atualizarTransacoesTotalFatura(array);
     setTotalFatura(array);
     GravarDadosLocalStorage(array, 'totalFatura');
-    //setTotalFaturas(array);
-
   }
 
   return (

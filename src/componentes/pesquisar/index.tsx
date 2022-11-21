@@ -1,5 +1,5 @@
 import { KeyboardEvent, useState } from "react";
-import { useTotalFatura } from "../../hooks/useTotalFatura";
+import { useTransacoes } from "../../hooks/useTransacoes";
 import { CalcularTotalFatura } from "../../Servicos/utilidades";
 import { ITotalFatura, ITransacao } from "../../tipos"
 import { Container } from "./styles";
@@ -10,7 +10,7 @@ interface PesquisarProps {
 
 export function Pesquisar({ totalFatura }: PesquisarProps) {
 
-  const { atualizarTransacoesPorTotalFatura, atualizarTransacoesPorTotalFaturaSnapshot } = useTotalFatura();
+  const { atualizarTransacoesPorTotalFatura, atualizarTransacoesPorTotalFaturaSnapshot } = useTransacoes();
   const [parametrosPesquisa, setParametrosPesquisa] = useState("");
 
   function handleKeypress(e: KeyboardEvent) {

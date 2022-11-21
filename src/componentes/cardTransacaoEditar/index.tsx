@@ -3,10 +3,10 @@ import { Container, Grid } from "./styles";
 
 import DatePicker from 'react-datepicker'
 import { FormEvent, useState } from "react";
-import { useTotalFatura } from "../../hooks/useTotalFatura";
 
 import { registerLocale } from 'react-datepicker';
 import pt from 'date-fns/locale/pt';
+import { useTransacoes } from "../../hooks/useTransacoes";
 
 registerLocale('pt', pt);
 
@@ -16,7 +16,7 @@ interface CardTransacaoEditarProps {
 
 export function CardTransacaoEditar({ transacao }: CardTransacaoEditarProps) {
 
-  const { atualizarTransacao } = useTotalFatura();
+  const { atualizarTransacao } = useTransacoes();
 
   const [data, setData] = useState(transacao.data);
   const [produto, setProduto] = useState(transacao.produto);
