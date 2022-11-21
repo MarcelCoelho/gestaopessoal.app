@@ -1,9 +1,14 @@
 import { ITransacao } from "../../tipos";
-import { Container, Grid, Info } from "./styles";
+import { Container, Grid } from "./styles";
 
 import DatePicker from 'react-datepicker'
 import { FormEvent, useState } from "react";
 import { useTotalFatura } from "../../hooks/useTotalFatura";
+
+import { registerLocale } from 'react-datepicker';
+import pt from 'date-fns/locale/pt';
+
+registerLocale('pt', pt);
 
 interface CardTransacaoEditarProps {
   transacao: ITransacao;
@@ -11,7 +16,7 @@ interface CardTransacaoEditarProps {
 
 export function CardTransacaoEditar({ transacao }: CardTransacaoEditarProps) {
 
-  //const { } = useTotalFatura();
+  const { atualizarTransacao } = useTotalFatura();
 
   const [data, setData] = useState(transacao.data);
   const [produto, setProduto] = useState(transacao.produto);
@@ -34,8 +39,7 @@ export function CardTransacaoEditar({ transacao }: CardTransacaoEditarProps) {
     transacao.observacao = observacao;
     transacao.valor = valor;
 
-    //modoEdicao(transacao);
-
+    atualizarTransacao(transacao);
   }
 
   return (
@@ -43,75 +47,79 @@ export function CardTransacaoEditar({ transacao }: CardTransacaoEditarProps) {
       <Grid>
         <form onSubmit={handleAtualizarTransacao}>
           <table>
-            <td>
-              <DatePicker
-                className="datapicker"
-                placeholderText="Data"
-                locale="pt"
-                selected={new Date(data)}
-                onChange={(date: Date) => setData(new Date(date))}
-                dateFormat="dd/MM/yyyy">
-              </DatePicker>
-            </td>
-            <td>
-              <input
-                className="produto"
-                placeholder="Produto"
-                value={produto}
-                onChange={(event) => setProduto(event.target.value)}
-              ></input>
-            </td>
-            <td>
-              <input
-                className="loja"
-                placeholder="Loja"
-                value={loja}
-                onChange={(event) => setLoja(event.target.value)}
-              ></input>
-            </td>
-            <td>
-              <input
-                className="local"
-                placeholder="Local"
-                value={local}
-                onChange={(event) => setLocal(event.target.value)}
-              ></input>
-            </td>
-            <td>
-              <input
-                className="numeroParcela"
-                placeholder="NumeroParcela"
-                value={numeroParcela}
-                onChange={(event) => setNumeroParcela(Number(event.target.value))}
-              ></input>
-            </td>
-            <td>
-              <input
-                className="quantidadeParcelas"
-                placeholder="QuantidadeParcelas"
-                value={quantidadeParcelas}
-                onChange={(event) => setQuantidadeParcelas(Number(event.target.value))}
-              ></input>
-            </td>
-            <td>
-              <input
-                className="observacao"
-                placeholder="Observação"
-                value={observacao}
-                onChange={(event) => setObservacao(event.target.value)}
-              ></input>
-            </td>
-            <td>
-              <input
-                className="valor"
-                placeholder="Valor"
-                value={valor}
-                onChange={(event) => setValor(event.target.value)}
-              ></input>
-            </td>
-            <td>
-              <button type="submit">Gravar</button>
-            </td>
+            <tbody>
+              <tr>
+                <td>
+                  <DatePicker
+                    className="datapicker"
+                    placeholderText="Data"
+                    locale="pt"
+                    selected={new Date(data)}
+                    onChange={(date: Date) => setData(new Date(date))}
+                    dateFormat="dd/MM/yyyy">
+                  </DatePicker>
+                </td>
+                <td>
+                  <input
+                    className="produto"
+                    placeholder="Produto"
+                    value={produto}
+                    onChange={(event) => setProduto(event.target.value)}
+                  ></input>
+                </td>
+                <td>
+                  <input
+                    className="loja"
+                    placeholder="Loja"
+                    value={loja}
+                    onChange={(event) => setLoja(event.target.value)}
+                  ></input>
+                </td>
+                <td>
+                  <input
+                    className="local"
+                    placeholder="Local"
+                    value={local}
+                    onChange={(event) => setLocal(event.target.value)}
+                  ></input>
+                </td>
+                <td>
+                  <input
+                    className="numeroParcela"
+                    placeholder="NumeroParcela"
+                    value={numeroParcela}
+                    onChange={(event) => setNumeroParcela(Number(event.target.value))}
+                  ></input>
+                </td>
+                <td>
+                  <input
+                    className="quantidadeParcelas"
+                    placeholder="QuantidadeParcelas"
+                    value={quantidadeParcelas}
+                    onChange={(event) => setQuantidadeParcelas(Number(event.target.value))}
+                  ></input>
+                </td>
+                <td>
+                  <input
+                    className="observacao"
+                    placeholder="Observação"
+                    value={observacao}
+                    onChange={(event) => setObservacao(event.target.value)}
+                  ></input>
+                </td>
+                <td>
+                  <input
+                    className="valor"
+                    placeholder="Valor"
+                    value={valor}
+                    onChange={(event) => setValor(event.target.value)}
+                  ></input>
+                </td>
+                <td>
+                  <button type="submit">Gravar</button>
+                </td>
+              </tr>
+            </tbody>
           </table>
         </form>
       </Grid>

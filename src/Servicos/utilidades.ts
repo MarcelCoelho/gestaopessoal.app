@@ -4,7 +4,11 @@ export const GravarDadosLocalStorage = (array: ITotalFatura[], nome: string) => 
   if (array !== null && array !== undefined && array.length > 0)
     localStorage.setItem(nome, JSON.stringify(array));
   else
-    localStorage.removeItem(nome);
+    RemoverDadosLocalStorage(nome);
+}
+
+export const RemoverDadosLocalStorage = (nome: string) => {
+  localStorage.removeItem(nome);
 }
 
 export const Ordenar = (array1: ITotalFatura, array2: ITotalFatura) => {
@@ -17,18 +21,8 @@ export const Ordenar = (array1: ITotalFatura, array2: ITotalFatura) => {
   return 0;
 }
 
-export const OrdenarData = (array1: ITransacao, array2: ITransacao) => {
-  if (new Date(array1.dataCriacao) < new Date(array2.dataCriacao)) {
-    return -1;
-  }
-  if (new Date(array1.dataCriacao) > new Date(array2.dataCriacao)) {
-    return 1;
-  }
-  return 0;
-}
-
 export const CalcularTotalFatura = (transacoes: ITransacao[]) => {
-  if (transacoes != null && transacoes != undefined && transacoes.length > 0) {
+  if (transacoes !== null && transacoes !== undefined && transacoes.length > 0) {
     let valorTotal = 0;
     for (var idx = 0; idx <= transacoes.length - 1; idx++) {
       valorTotal += Number(transacoes[idx].valor);

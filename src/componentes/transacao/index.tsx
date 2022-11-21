@@ -34,14 +34,13 @@ export function Transacao() {
       setTotalFatura(total);
     }
 
-    //setTotalFatura(transacoesPorTotalFatura);
   }, [transacoesPorTotalFatura])
 
   function handleAlterarEstadoVisibilidadeTransacoes(id: string) {
     atualizarMostrarTransacoes(id);
 
     let itemID = visibilidadeTotalFatura?.filter(vtf => vtf.faturaID === id)[0];
-    if (itemID == null || itemID == undefined) {
+    if (itemID === null || itemID === undefined) {
       const novoItemID: IVisibilidadeTotalFatura[] = [{
         "faturaID": id,
         "visible": true
@@ -74,19 +73,22 @@ export function Transacao() {
   }
 
   function atualizarEstiloComponente(visible: boolean, id: string) {
+    let divContainer: HTMLElement | null;
+    let divConteudo: HTMLElement | null;
+
     if (visible) {
-      var divContainer = document.getElementById('container_' + id);
+      divContainer = document.getElementById('container_' + id);
       divContainer?.setAttribute("style", "height: auto");
 
-      var divConteudo = document.getElementById('conteudo_' + id);
+      divConteudo = document.getElementById('conteudo_' + id);
       divConteudo?.setAttribute("style", "visibility: visible");
 
     }
     else {
-      var divContainer = document.getElementById('container_' + id);
+      divContainer = document.getElementById('container_' + id);
       divContainer?.setAttribute("style", "height: 4rem");
 
-      var divConteudo = document.getElementById('conteudo_' + id);
+      divConteudo = document.getElementById('conteudo_' + id);
       divConteudo?.setAttribute("style", "visibility: hidden");
 
     }
@@ -122,75 +124,80 @@ export function Transacao() {
         <>
           <Container>
             {totalFatura && (
-              totalFatura.map(totalFatura => (
+              totalFatura.map((totalFatura, index) => (
+
                 <ConteudoTransacao
-                  key={totalFatura.id}
+                  key={index}
                   id={"container_" + totalFatura.id}
                   faturaAtual={totalFatura.atual}
                   faturaFechada={totalFatura.fechada}
                   style={{ height: "4.5rem" }}>
                   <Cabecalho id={totalFatura.id} >
-                    <div className="expandirTransacoes" onClick={() => { handleAlterarEstadoVisibilidadeTransacoes(totalFatura.id) }}>
-                      {totalFatura.transacoesVisiveis ? (
-                        <FiChevronDown size={16} />
-                      ) : (<FiChevronRight size={16} />)}
-                    </div>
+                    <>
+                      <div className="expandirTransacoes" onClick={() => { handleAlterarEstadoVisibilidadeTransacoes(totalFatura.id) }}>
+                        {totalFatura.transacoesVisiveis ? (
+                          <FiChevronDown size={16} />
+                        ) : (<FiChevronRight size={16} />)}
+                      </div>
 
-                    <div className="dataFatura">
-                      <p>
-                        {totalFatura.descricao}</p>
-                      <span>
-                        {new Intl.DateTimeFormat().format(
-                          new Date(totalFatura.dataInicio)
-                        )} - {new Intl.DateTimeFormat().format(
-                          new Date(totalFatura.dataFinal)
-                        )}
-                      </span>
-                    </div>
-                    <div className="contadorTransacoes">
-                      <p>
-                        {totalFatura.quantidadeTransacoes}
-                      </p>
-                      <span>
-                        transações
-                      </span>
-                    </div>
-                    <div className="valorFatura">
-                      <p>
-                        {new Intl.NumberFormat("pt-Br", {
-                          style: "currency",
-                          currency: "BRL",
-                        }).format(Number(totalFatura.valor))
-                        }</p>
-                      <span>{"Total Fatura"}</span>
-                    </div>
+                      <div className="dataFatura">
+                        <p>
+                          {totalFatura.descricao}</p>
+                        <span>
+                          {new Intl.DateTimeFormat().format(
+                            new Date(totalFatura.dataInicio)
+                          )} - {new Intl.DateTimeFormat().format(
+                            new Date(totalFatura.dataFinal)
+                          )}
+                        </span>
+                      </div>
+                      <div className="contadorTransacoes">
+                        <p>
+                          {totalFatura.quantidadeTransacoes}
+                        </p>
+                        <span>
+                          transações
+                        </span>
+                      </div>
+                      <div className="valorFatura">
+                        <p>
+                          {new Intl.NumberFormat("pt-Br", {
+                            style: "currency",
+                            currency: "BRL",
+                          }).format(Number(totalFatura.valor))
+                          }</p>
+                        <span>{"Total Fatura"}</span>
+                      </div>
 
-                    {totalFatura.transacoesVisiveis && (
-                      <Pesquisar totalFatura={totalFatura} />
-                    )}
+                      {totalFatura.transacoesVisiveis && (
+                        <Pesquisar totalFatura={totalFatura} />
+                      )}
+                    </>
                   </Cabecalho>
 
-                  <Conteudo id={"conteudo_" + totalFatura.id} style={{ visibility: "hidden" }}>
-                    {totalFatura.transacoes && (
-                      totalFatura.transacoes?.map((transacao) => (
+                  <Conteudo id={"conteudo_" + totalFatura.id} key={totalFatura.id} style={{ visibility: "hidden" }}>
 
-                        <>
+                    {totalFatura.transacoes && (
+                      totalFatura.transacoes?.map((transacao, index) => (
+
+                        <div key={index}>
                           {transacao.editando ? (
                             <CardTransacaoEditar
-                              key={transacao.id}
+
                               transacao={transacao}
                             />
                           ) : <CardTransacao
-                            key={transacao.id}
+
                             transacao={transacao}
                             faturaAtual={totalFatura.atual}
                             faturaFechada={totalFatura.fechada}
                           />
                           }
-                        </>
+                        </div>
 
                       ))
                     )}
+
                   </Conteudo>
                 </ConteudoTransacao>
               )))}

@@ -65,8 +65,10 @@ export function Pesquisar({ totalFatura }: PesquisarProps) {
       if (arrayItems.length > 0 && filtrarExcecoes) {
         let novoArray: ITransacao[] = [];
         for (var idx = 0; idx <= totalFatura.transacoes.length - 1; idx++) {
-          const transacao = arrayItems.filter(ayt => ayt.id === totalFatura.transacoes[idx].id)[0];
-          if (transacao == null || transacao == undefined) {
+          const transacaoID = totalFatura.transacoes[idx].id;
+
+          const transacao = arrayItems.filter(ayt => ayt.id === transacaoID)[0];
+          if (transacao === null || transacao === undefined) {
             novoArray.push(totalFatura.transacoes[idx]);
           }
         }

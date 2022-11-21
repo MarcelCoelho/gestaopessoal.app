@@ -1,5 +1,3 @@
-import React from 'react';
-
 import {
   createContext,
   useEffect,
@@ -8,7 +6,7 @@ import {
   useContext,
 } from "react";
 import { api } from '../Servicos/api';
-import { CalcularTotalFatura, Ordenar, GravarDadosLocalStorage, OrdenarData } from '../Servicos/utilidades';
+import { CalcularTotalFatura, Ordenar, GravarDadosLocalStorage, RemoverDadosLocalStorage } from '../Servicos/utilidades';
 import { ITotalFatura, ITransacao } from '../tipos';
 
 //import Cookies from 'js-cookie';
@@ -26,6 +24,7 @@ interface TotalFaturaContextData {
   atualizarFaturasSelecionadas: (totalFaturas: ITotalFatura[], selecionarTodasFaturas: boolean) => void;
   excluirTransacao: (idFatura: string, idTransacao: string) => void;
   modoEdicao: (transacao: ITransacao) => void;
+  atualizarTransacao: (transacao: ITransacao) => void;
   faturasSelecionadas: ITotalFatura[];
   transacoesPorTotalFatura: ITotalFatura[];
   valorTotalFaturasSelecionadas: number;
@@ -48,6 +47,8 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
   const [valorTotalFaturasSelecionadas, setValorTotalFaturasSelecionadas] = useState(0);
 
   const [loading, setLoading] = useState(false);
+
+
 
   useEffect(() => {
     buscarTransacoesPorFaturas()
@@ -91,7 +92,10 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
     else {
       setFaturasSelecionadas([]);
       setValorTotalFaturasSelecionadas(CalcularTotalFaturasSelecionadas([]));
-      GravarDadosLocalStorage([], 'faturasSelecionadas');
+      setTransacoesPorTotalFatura([]);
+      setTransacoesPorTotalFaturaSnapshot([]);
+      RemoverDadosLocalStorage('faturasSelecionadas');
+      RemoverDadosLocalStorage('totalFatura');
     }
     setTodasFaturasSelecionadas(selecionarTodasFaturas);
   }
@@ -102,8 +106,15 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
 
     if (adicionarTotalFatura) {
       array = Object.values(faturasSelecionadas);
-      array.push(totalFatura);
-      setFaturasSelecionadas([...faturasSelecionadas, totalFatura]);
+
+      const totalFaturaFiltrado = faturasSelecionadas.filter(fs => fs.id === totalFatura.id)[0];
+
+      // se este TOTAL FATURA ainda NAO foi adicionado na lista, adiciona
+      if (totalFaturaFiltrado === null || totalFaturaFiltrado === undefined) {
+        array.push(totalFatura);
+        setFaturasSelecionadas([...faturasSelecionadas, totalFatura]);
+      }
+
     }
     else {
       array = faturasSelecionadas.filter(fs => fs.id !== totalFatura.id);
@@ -116,7 +127,7 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
 
   function CalcularTotalFaturasSelecionadas(array: ITotalFatura[]) {
     let valorTotal = 0;
-    if (array != null && array != undefined && array.length > 0) {
+    if (array !== null && array !== undefined && array.length > 0) {
       for (var idx = 0; idx <= array.length - 1; idx++) {
         valorTotal += array[idx].valor;
       }
@@ -234,7 +245,6 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
     }
   }
 
-
   function modoEdicao(transacao: ITransacao) {
     transacao.editando = !transacao.editando;
 
@@ -258,8 +268,6 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
         const indiceTransacao = totalFaturaClonado.transacoes.indexOf(transacaoClonada);
         if (indiceTransacao > -1) {
           totalFaturaClonado.transacoes.splice(indiceTransacao, 1, transacao);
-          //totalFaturaClonado.transacoes.push(transacao);
-          //totalFaturaClonado.transacoes.sort(OrdenarData);
         }
       }
     }
@@ -277,6 +285,17 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
     return totalFaturasClonado;
   }
 
+  async function atualizarTransacao(transacao: ITransacao) {
+    transacao.editando = false;
+    await api.put<ITotalFatura[]>(`/api/transacao/${transacao.id}`, { ...transacao });
+
+    const totalFaturaClonado = substituirTransacao(transacao);
+    const totalFaturasClonado = substituirTotalFatura(totalFaturaClonado);
+
+    GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
+    setTransacoesPorTotalFatura(totalFaturasClonado);
+  }
+
   return (
     <TotalFaturaContext.Provider
       value={{
@@ -288,6 +307,7 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
         atualizarFaturasSelecionadas,
         excluirTransacao,
         modoEdicao,
+        atualizarTransacao,
         faturasSelecionadas,
         transacoesPorTotalFatura,
         valorTotalFaturasSelecionadas,

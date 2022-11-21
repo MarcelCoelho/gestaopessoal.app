@@ -1,6 +1,8 @@
 import styled from "styled-components";
 
-export const Container = styled.div``;
+export const Container = styled.div`
+  
+`;
 
 export const Grid = styled.div`
     display: flex;
@@ -8,35 +10,42 @@ export const Grid = styled.div`
     justify-content: space-between;
 
     width: 60rem;
+    height: 5rem;
 
     border-radius: 0.4rem;
     
-    padding: 0.3rem;
+    padding: 0.8rem;
     background: var(--shape);
     
 
     form {
         font-size: 0.7rem;        
         color: var(--text-body);
-
+        align-items: center;
+          justify-content: center;
         td {         
-          
+          align-items: center;
+          justify-content: center;
         }
 
         input {
+          
           text-align: left;
           width: 8rem;    
           flex-wrap: wrap;
           padding: 0.1rem;
-          height: 2rem;
+          height: 3rem;
           border-radius: 0.25rem;
-
+          border: none;
           border: 0.1rem solid var(--border-botton);
-          background: #e7e9ee;
+          //background: #e7e9ee;
 
           font-weight: 400;
           font-size: 0.8rem;
 
+          &:focus {
+            border: none;
+          }
           &::placeholder {
             color: var(--text-body);
           } 
@@ -69,7 +78,7 @@ export const Grid = styled.div`
         button[type="submit"] {
           width: 100%;
           padding: 0.5rem;
-          height: 2rem;
+          height: 3rem;
           background: var(--green);
           
           border-radius: 0.25rem;

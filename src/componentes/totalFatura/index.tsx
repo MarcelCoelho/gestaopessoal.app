@@ -1,7 +1,6 @@
 import { Checkbox } from "@material-ui/core";
-import { blue } from "@material-ui/core/colors";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useTotalFatura } from "../../hooks/useTotalFatura";
 
 import { api } from "../../Servicos/api";
@@ -20,6 +19,18 @@ export function TotalFatura() {
   const { atualizarFaturasSelecionadas,
     faturasSelecionadas,
     valorTotalFaturasSelecionadas } = useTotalFatura();
+
+  const location = useLocation();
+
+  useEffect(() => {
+    limparLocalStorage();
+  }, [location]);
+
+  const limparLocalStorage = () => {
+    if (location.pathname === "/totalFatura") {
+      atualizarFaturasSelecionadas([], false);
+    }
+  }
 
   const Navigate = useNavigate();
   useEffect(() => {
