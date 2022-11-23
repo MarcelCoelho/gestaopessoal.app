@@ -22,6 +22,7 @@ interface TransacoesContextData {
   atualizarTransacoesPorTotalFatura: (transacaoPorTotalFatura: ITotalFatura) => void;
   atualizarTransacoesPorTotalFaturaSnapshot: (totalFaturaID: string) => void;
   modoInserir: (totalFatura: ITotalFatura) => void;
+  gravarTransacao: (transacao: ITransacao, totalFatura: ITotalFatura) => void;
   cancelarInserir: (totalFatura: ITotalFatura) => void;
   modoEdicao: (transacao: ITransacao) => void;
   atualizarTransacao: (transacao: ITransacao) => void;
@@ -96,6 +97,12 @@ export function TransacoesProvider({ children }: TransacaoProviderProps) {
 
     setTransacoesTotalFatura(arrayClonado);
     GravarDadosLocalStorage(arrayClonado, 'totalFatura');
+  }
+
+  const gravarTransacao = (transacao: ITransacao, totalFatura: ITotalFatura) => {
+    alert(JSON.stringify(transacao));
+
+    cancelarInserir(totalFatura);
   }
 
   const modoInserir = (totalFatura: ITotalFatura) => {
@@ -245,6 +252,7 @@ export function TransacoesProvider({ children }: TransacaoProviderProps) {
         atualizarTransacoesPorTotalFatura,
         atualizarTransacoesPorTotalFaturaSnapshot,
         modoInserir,
+        gravarTransacao,
         cancelarInserir,
         modoEdicao,
         atualizarTransacao,

@@ -54,3 +54,19 @@ export type ITipoPagamento = {
   descricao: string;
   observacao: string;
 }
+
+export type IFatura = {
+  id: string;
+  mes: string;
+  ano: string;
+  dataInicio: Date;
+  dataFinal: Date;
+  ordem: number;
+  fechada: boolean;
+  observacao: string;
+  atual: boolean;
+  usuarioCriacao: string;
+  usuarioModificacao: string;
+  dataCriacao: Date;
+  dataModificacao: Date;
+}

@@ -5,7 +5,7 @@ import { FiX } from 'react-icons/fi';
 import DatePicker from 'react-datepicker';
 import { registerLocale } from 'react-datepicker';
 import pt from 'date-fns/locale/pt';
-import { ITipoPagamento, ITotalFatura } from '../../tipos';
+import { IFatura, ITipoPagamento, ITotalFatura, ITransacao } from '../../tipos';
 import { useTransacoes } from '../../hooks/useTransacoes';
 import { FormEvent, useEffect, useState } from 'react';
 import { RecuperarDadosLocalStorage } from '../../Servicos/utilidades';
@@ -17,7 +17,7 @@ interface CardTransacaoInserirProps {
 
 export function CardTransacaoInserir({ totalFatura }: CardTransacaoInserirProps) {
 
-  const { cancelarInserir } = useTransacoes();
+  const { gravarTransacao, cancelarInserir } = useTransacoes();
 
   const [data, setData] = useState(new Date());
   const [produto, setProduto] = useState("");
@@ -30,22 +30,95 @@ export function CardTransacaoInserir({ totalFatura }: CardTransacaoInserirProps)
   const [tipoPagamentoId, setTipoPagamentoId] = useState<string>("");
 
   const [listaTiposPagamento, setListaTiposPagamento] = useState<string[]>([]);
+  const [tiposPagamento, setTiposPagamento] = useState<ITipoPagamento[]>([]);
+
 
   useEffect(() => {
     let arrayTiposPagamento: string[] = [];
-    const tiposPagamento = RecuperarDadosLocalStorage<ITipoPagamento[]>('tiposPagamento');
-    tiposPagamento.map((tipoPagamento) => {
+    const listaTP = RecuperarDadosLocalStorage<ITipoPagamento[]>('tiposPagamento');
+    listaTP.map((tipoPagamento) => {
       arrayTiposPagamento.push(tipoPagamento.descricao);
-    })
+    });
 
+    setTipoPagamentoId(listaTP[1].descricao);
+
+    setTiposPagamento(listaTP);
     setListaTiposPagamento(arrayTiposPagamento);
+
   }, [])
 
   const handleGravarTransacao = (event: FormEvent) => {
     event.preventDefault();
 
-
+    const transacao = CriarTransacao();
+    gravarTransacao(transacao, totalFatura);
   }
+
+  function CriarTransacao() {
+
+    const dataAtual = new Date();
+
+    const transacao: ITransacao = {
+      id: "",
+      data: new Date(data),
+      dataTexto: new Date(data).toString(),
+      produto,
+      loja,
+      local,
+      numeroParcela: (numeroParcela !== undefined) ? numeroParcela : 1,
+      quantidadeParcelas: (quantidadeParcelas !== undefined) ? quantidadeParcelas : 1,
+      valor: Number.parseFloat(valor).toFixed(2),
+      observacao,
+      faturaId: totalFatura.id,
+      tipoPagamentoId: recuperarTipoPagamentoID(tipoPagamentoId),
+      editando: false,
+      estaSelecionado: false,
+      fatura: criarFaturaVazio(),
+      tipoPagamento: criarTipoPagamentoVazio(),
+      usuarioId: "",
+      dataCriacao: dataAtual,
+      dataModificacao: dataAtual,
+      usuarioCriacao: "",
+      usuarioModificacao: ""
+    }
+
+    return transacao;
+  }
+
+  function recuperarTipoPagamentoID(descricao: string) {
+    return tiposPagamento.filter(tp => tp.descricao === descricao)[0].id;
+  }
+
+  function criarFaturaVazio() {
+    const dataAtual = new Date();
+    const fatura: IFatura = {
+      id: "",
+      mes: "",
+      ano: "",
+      atual: false,
+      dataFinal: new Date(),
+      dataInicio: new Date(),
+      fechada: false,
+      observacao: "",
+      ordem: 0,
+      dataCriacao: dataAtual,
+      dataModificacao: dataAtual,
+      usuarioCriacao: "",
+      usuarioModificacao: ""
+    }
+    return fatura;
+  }
+
+  function criarTipoPagamentoVazio() {
+    const tipoPagamento: ITipoPagamento = {
+      id: "",
+      descricao: "",
+      codigo: "",
+      observacao: ""
+    };
+    return tipoPagamento;
+  }
+
   const handleCancelarInserir = () => {
     cancelarInserir(totalFatura);
   }
