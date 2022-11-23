@@ -54,22 +54,21 @@ export const Grid = styled.div`
 
       .botoes {
           display: flex;
-          width: 30rem;
-          margin-top: 0.8rem;          
+          width: 30rem;       
           justify-content: flex-end;
           gap: 0.5rem;
           padding: 0;
 
           button {            
-            height: 3rem;
-            padding: 0.7rem;
+            height: 2rem;
+            padding: 0.5rem;
             background: var(--border-botton);
             //color: var(--border-botton);
             border-radius: 0.2rem;
             border: 0.1rem solid var(--text-body);
-            font-size: 0.8rem;
+            font-size: 0.7rem;
             margin-top: 0.5rem;
-            font-weight: 600;
+            font-weight: 500;
 
           
             justify-content: flex-end;

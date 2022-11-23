@@ -92,17 +92,67 @@ export function TransacoesProvider({ children }: TransacaoProviderProps) {
     }
 
     arrayClonado.push(totalFaturaFiltrado);
-
     arrayClonado.sort(Ordenar);
 
     setTransacoesTotalFatura(arrayClonado);
     GravarDadosLocalStorage(arrayClonado, 'totalFatura');
   }
 
-  const gravarTransacao = (transacao: ITransacao, totalFatura: ITotalFatura) => {
-    alert(JSON.stringify(transacao));
+  const adicionarTransacaoTotalFaturaSnapshot = (transacao: ITransacao) => {
+    //snapshot
+    const transacoesTotalFaturasSnapshotClonado = Object.values(transacoesTotalFaturaSnapshot);
+    const totalFaturaSnapshotClonado = transacoesTotalFaturasSnapshotClonado.filter(snp => snp.id === transacao.faturaId)[0];
 
-    cancelarInserir(totalFatura);
+    totalFaturaSnapshotClonado.transacoes.unshift(transacao);
+    totalFaturaSnapshotClonado.quantidadeTransacoes = totalFaturaSnapshotClonado.transacoes.length;
+    totalFaturaSnapshotClonado.valor = CalcularTotalFatura(totalFaturaSnapshotClonado.transacoes);
+
+    const indiceSnapshot = transacoesTotalFaturasSnapshotClonado.indexOf(totalFaturaSnapshotClonado);
+    if (indiceSnapshot > -1)
+      transacoesTotalFaturasSnapshotClonado.splice(indiceSnapshot, 1);
+
+    transacoesTotalFaturasSnapshotClonado.push(totalFaturaSnapshotClonado);
+    transacoesTotalFaturasSnapshotClonado.sort(Ordenar);
+    setTransacoesTotalFaturaSnapshot(transacoesTotalFaturasSnapshotClonado);
+  }
+
+  const adicionarTransacaoTotalFatura = (transacao: ITransacao) => {
+    const totalFaturaClonado = transacoesTotalFatura.filter(tf => tf.id === transacao.faturaId)[0];
+
+    totalFaturaClonado.transacoes.unshift(transacao);
+    totalFaturaClonado.quantidadeTransacoes = totalFaturaClonado.transacoes.length;
+    totalFaturaClonado.valor = CalcularTotalFatura(totalFaturaClonado.transacoes);
+
+    const totalFaturasClonado = substituirTotalFatura(totalFaturaClonado);
+    GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
+    atualizarTransacoesTotalFatura(totalFaturasClonado);
+  }
+
+  const gravarTransacaoBaseDados = async (transacao: ITransacao) => {
+    const response = await api.post<ITransacao>("/api/transacao",
+      {
+        ...transacao,
+        usuarioCriacao: 'web',
+        usuarioModificacao: 'web'
+      });
+
+    return response.data;
+  }
+
+  const gravarTransacao = async (transacao: ITransacao, totalFatura: ITotalFatura) => {
+    try {
+      const transacaoGravada = await gravarTransacaoBaseDados(transacao);
+
+      adicionarTransacaoTotalFatura(transacaoGravada);
+      adicionarTransacaoTotalFaturaSnapshot(transacaoGravada);
+
+      cancelarInserir(totalFatura);
+    }
+    catch (error) {
+      alert(error);
+      cancelarInserir(totalFatura);
+      console.log(error);
+    }
   }
 
   const modoInserir = (totalFatura: ITotalFatura) => {

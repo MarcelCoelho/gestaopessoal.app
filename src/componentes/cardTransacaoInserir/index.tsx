@@ -1,6 +1,4 @@
 import { Container, Grid, CssTextField } from './styles';
-import { FiX } from 'react-icons/fi';
-//import { useTransacoes } from "../../hooks/useTransacoes";
 
 import DatePicker from 'react-datepicker';
 import { registerLocale } from 'react-datepicker';
@@ -36,7 +34,7 @@ export function CardTransacaoInserir({ totalFatura }: CardTransacaoInserirProps)
   useEffect(() => {
     let arrayTiposPagamento: string[] = [];
     const listaTP = RecuperarDadosLocalStorage<ITipoPagamento[]>('tiposPagamento');
-    listaTP.map((tipoPagamento) => {
+    listaTP.map((tipoPagamento: ITipoPagamento) => {
       arrayTiposPagamento.push(tipoPagamento.descricao);
     });
 
@@ -208,8 +206,8 @@ export function CardTransacaoInserir({ totalFatura }: CardTransacaoInserirProps)
               </div>
             </div>
             <div className="botoes">
-              <button type="submit">Gravar Transação</button>
               <button type="button" onClick={handleCancelarInserir}>Cancelar</button>
+              <button type="submit">Gravar Transação</button>
             </div>
           </div>
           {/*<FiX size={18} onClick={handleCancelarInserir} />*/}

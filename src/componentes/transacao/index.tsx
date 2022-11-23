@@ -1,12 +1,12 @@
 import { useEffect } from "react";
 import { useState } from "react";
-import { ITipoPagamento, ITotalFatura, } from "../../tipos";
+import { ITotalFatura, } from "../../tipos";
 import { CardTransacao } from "../cardTransacao";
 import { Container, ConteudoTransacao, Cabecalho, Conteudo } from "./styles";
 import { FiChevronRight, FiChevronDown, FiPlus } from 'react-icons/fi';
 import { Loading } from "../loading";
 import { Pesquisar } from "../pesquisar";
-import { Ordenar, GravarDadosLocalStorage, RecuperarDadosLocalStorage } from "../../Servicos/utilidades";
+import { Ordenar, GravarDadosLocalStorage } from "../../Servicos/utilidades";
 import { CardTransacaoEditar } from "../cardTransacaoEditar";
 import { useTransacoes } from "../../hooks/useTransacoes";
 import { CardTransacaoInserir } from "../cardTransacaoInserir";
