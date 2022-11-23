@@ -53,6 +53,31 @@ export const Cabecalho = styled.div`
     //background-color: #e1e3e7;
   }
 
+  .modoInserir{
+    margin-top: -0.5rem;
+    display: flex;
+    flex-direction: column;    
+    align-items: center;
+    font-size: 1.4rem;
+    font-weight: bold;
+    padding: 0;
+
+    cursor: pointer;
+
+    transition: background-color 0.2s;
+
+    &:hover {
+      background: var(--fundoCard);
+      filter: brightness(0.9);      
+    }
+
+    span {
+      margin: 0.5rem;
+      font-size: 0.7rem;
+      font-weight: normal;
+    }
+  }
+
   .dataFatura {
     margin-top: -0.5rem;
     display: flex;

@@ -1,10 +1,22 @@
 import { ITotalFatura, ITransacao } from "../tipos";
 
-export const GravarDadosLocalStorage = (array: ITotalFatura[], nome: string) => {
+export const GravarDadosLocalStorage = <T>(array: T[], nome: string) => {
   if (array !== null && array !== undefined && array.length > 0)
     localStorage.setItem(nome, JSON.stringify(array));
   else
     RemoverDadosLocalStorage(nome);
+}
+
+export const RecuperarDadosLocalStorage = <T>(nome: string) => {
+
+  const dadosLocalStorage = localStorage.getItem(nome);
+  if (dadosLocalStorage) {
+    const total: T = JSON.parse(dadosLocalStorage);
+
+    return total;
+  }
+
+  return [];
 }
 
 export const RemoverDadosLocalStorage = (nome: string) => {

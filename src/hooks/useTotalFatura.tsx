@@ -5,8 +5,9 @@ import {
   ReactNode,
   useContext,
 } from "react";
-import { GravarDadosLocalStorage, RemoverDadosLocalStorage } from '../Servicos/utilidades';
-import { ITotalFatura } from '../tipos';
+import { api } from "../Servicos/api";
+import { GravarDadosLocalStorage, RecuperarDadosLocalStorage, RemoverDadosLocalStorage } from '../Servicos/utilidades';
+import { ITipoPagamento, ITotalFatura } from '../tipos';
 
 interface TotalFaturaProviderProps {
   children: ReactNode;
@@ -32,8 +33,24 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
 
   useEffect(() => {
     atualizarFaturasSelecionadasComLocalStorage();
+    atualizarTiposPagamentoComLocalStorage();
   }, []);
 
+
+  const atualizarTiposPagamentoComLocalStorage = async () => {
+    const tiposPagamentos = await buscarListaTiposPagamento();
+    GravarDadosLocalStorage(tiposPagamentos, 'tiposPagamento');
+  }
+
+  const buscarListaTiposPagamento = async () => {
+
+    const tiposPagamentoLocalStorage = RecuperarDadosLocalStorage<ITipoPagamento[]>('tiposPagamento');
+    if (tiposPagamentoLocalStorage && tiposPagamentoLocalStorage.length > 0)
+      return tiposPagamentoLocalStorage;
+
+    const response = await api.get<ITipoPagamento[]>("/api/TipoPagamento");
+    return response.data;
+  }
 
   const atualizarFaturasSelecionadasComLocalStorage = () => {
     if (faturasSelecionadas.length === 0) {

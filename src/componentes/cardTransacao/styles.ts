@@ -39,10 +39,16 @@ export const Grid = styled.div<Props>`
       font-size: 1rem;
     }
     
+    .inserir {
+      width: 2rem;
+      text-align: end;
+      cursor: pointer;
+    }
+
     .editar {
       width: 2rem;
       text-align: end;
-      cursor: pointer;    
+      cursor: pointer;
     }
     .excluir {
       width: 1rem;

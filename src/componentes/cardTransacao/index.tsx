@@ -1,6 +1,6 @@
 import { ITransacao } from "../../tipos";
 import { Container, Grid, Info } from "./styles";
-import { FiInfo, FiEdit2, FiTrash2 } from 'react-icons/fi';
+import { FiInfo, FiPlus, FiEdit2, FiTrash2 } from 'react-icons/fi';
 import { useTransacoes } from "../../hooks/useTransacoes";
 
 interface CardTransacaoProps {
@@ -11,8 +11,7 @@ interface CardTransacaoProps {
 
 export function CardTransacao({ transacao, faturaAtual, faturaFechada }: CardTransacaoProps) {
 
-
-  const { excluirTransacao, modoEdicao } = useTransacoes();
+  const { modoEdicao, excluirTransacao } = useTransacoes();
 
   async function handleExibirInfo(id: string) {
     const divInfo = document.getElementById(id);
@@ -27,7 +26,7 @@ export function CardTransacao({ transacao, faturaAtual, faturaFechada }: CardTra
     divInfo?.setAttribute("style", "visibility: hidden");
   }
 
-  function handleEditar(id: string) {
+  function handleEditar() {
     modoEdicao(transacao);
   }
 
@@ -56,7 +55,8 @@ export function CardTransacao({ transacao, faturaAtual, faturaFechada }: CardTra
           currency: "BRL",
         }).format(Number(transacao.valor))}</div>
 
-        <div className="editar" onClick={() => handleEditar(transacao.id)}>
+
+        <div className="editar" onClick={handleEditar}>
           <FiEdit2 size="16" />
         </div>
         <div className="excluir" onClick={() => handleExcluir(transacao.faturaId, transacao.id)}>

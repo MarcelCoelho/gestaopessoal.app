@@ -45,4 +45,12 @@ export type ITotalFatura = {
   transacoesVisiveis: boolean;
   ordem: number;
   transacoes: ITransacao[];
+  modoInserir: boolean;
+}
+
+export type ITipoPagamento = {
+  id: string;
+  codigo: string;
+  descricao: string;
+  observacao: string;
 }

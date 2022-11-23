@@ -1,19 +1,24 @@
 import { useEffect } from "react";
 import { useState } from "react";
-import { useTotalFatura } from "../../hooks/useTotalFatura";
-import { ITotalFatura, } from "../../tipos";
+import { ITipoPagamento, ITotalFatura, } from "../../tipos";
 import { CardTransacao } from "../cardTransacao";
 import { Container, ConteudoTransacao, Cabecalho, Conteudo } from "./styles";
-import { FiChevronRight, FiChevronDown } from 'react-icons/fi';
+import { FiChevronRight, FiChevronDown, FiPlus } from 'react-icons/fi';
 import { Loading } from "../loading";
 import { Pesquisar } from "../pesquisar";
-import { Ordenar, GravarDadosLocalStorage } from "../../Servicos/utilidades";
+import { Ordenar, GravarDadosLocalStorage, RecuperarDadosLocalStorage } from "../../Servicos/utilidades";
 import { CardTransacaoEditar } from "../cardTransacaoEditar";
 import { useTransacoes } from "../../hooks/useTransacoes";
+import { CardTransacaoInserir } from "../cardTransacaoInserir";
 
 interface IVisibilidadeTotalFatura {
   faturaID: string;
   visible: boolean;
+}
+
+interface IModoInserir {
+  faturaID: string;
+  ativo: boolean;
 }
 
 export function Transacao() {
@@ -21,11 +26,13 @@ export function Transacao() {
   const {
     buscarTransacoesTotalFatura,
     atualizarTransacoesTotalFatura,
+    modoInserir,
     transacoesTotalFatura,
     loading
   } = useTransacoes();
 
   const [visibilidadeTotalFatura, setVisibilidadeTotalFatura] = useState<IVisibilidadeTotalFatura[]>([]);
+  const [controleModoInserir, setControleModoInserir] = useState<IModoInserir[]>([]);
   const [totalFatura, setTotalFatura] = useState<ITotalFatura[]>([]);
 
   useEffect(() => {
@@ -54,13 +61,13 @@ export function Transacao() {
       setTotalFatura(transacoesTotalFatura);
   }
 
-  function handleAlterarEstadoVisibilidadeTransacoes(id: string) {
-    atualizarMostrarTransacoes(id);
+  function handleAlterarEstadoVisibilidadeTransacoes(faturaID: string) {
+    atualizarMostrarTransacoes(faturaID);
 
-    let itemID = visibilidadeTotalFatura?.filter(vtf => vtf.faturaID === id)[0];
+    let itemID = visibilidadeTotalFatura?.filter(vtf => vtf.faturaID === faturaID)[0];
     if (itemID === null || itemID === undefined) {
       const novoItemID: IVisibilidadeTotalFatura[] = [{
-        "faturaID": id,
+        "faturaID": faturaID,
         "visible": true
       }];
 
@@ -69,12 +76,12 @@ export function Transacao() {
       else
         setVisibilidadeTotalFatura(novoItemID);
 
-      atualizarEstiloComponente(novoItemID[0].visible, id);
+      atualizarEstiloComponente(novoItemID[0].visible, faturaID);
     }
     else {
 
       const novoItemID: IVisibilidadeTotalFatura = {
-        "faturaID": id,
+        "faturaID": faturaID,
         "visible": !itemID.visible
       }
 
@@ -86,7 +93,7 @@ export function Transacao() {
       arrayClonado.push(novoItemID);
 
       setVisibilidadeTotalFatura(arrayClonado);
-      atualizarEstiloComponente(novoItemID.visible, id);
+      atualizarEstiloComponente(novoItemID.visible, faturaID);
     }
   }
 
@@ -132,6 +139,25 @@ export function Transacao() {
     GravarDadosLocalStorage(array, 'totalFatura');
   }
 
+  function ativarDesativarModoInserir(faturaID: string) {
+    let itemID = controleModoInserir?.filter(cmi => cmi.faturaID === faturaID)[0];
+    if (itemID === null || itemID === undefined) {
+      const novoItemID: IModoInserir[] = [{
+        "faturaID": faturaID,
+        "ativo": true
+      }];
+
+      setControleModoInserir(novoItemID);
+    }
+  }
+
+  const handleInserir = (totalFatura: ITotalFatura) => {
+    if (!totalFatura.modoInserir) {
+      ativarDesativarModoInserir(totalFatura.id);
+      modoInserir(totalFatura);
+    }
+  }
+
   return (
     <>
       {loading ? (
@@ -155,6 +181,12 @@ export function Transacao() {
                           <FiChevronDown size={16} />
                         ) : (<FiChevronRight size={16} />)}
                       </div>
+
+                      {!totalFatura.modoInserir && totalFatura.transacoesVisiveis && (
+                        <div className="modoInserir" onClick={() => { handleInserir(totalFatura) }}>
+                          <p><FiPlus size={22} /></p>
+                          <span>Adicionar Transação</span>
+                        </div>)}
 
                       <div className="dataFatura">
                         <p>
@@ -185,7 +217,7 @@ export function Transacao() {
                         <span>{"Total Fatura"}</span>
                       </div>
 
-                      {totalFatura.transacoesVisiveis && (
+                      {!totalFatura.modoInserir && totalFatura.transacoesVisiveis && (
                         <Pesquisar totalFatura={totalFatura} />
                       )}
                     </>
@@ -193,26 +225,29 @@ export function Transacao() {
 
                   <Conteudo id={"conteudo_" + totalFatura.id} key={totalFatura.id} style={{ visibility: "hidden" }}>
 
-                    {totalFatura.transacoes && (
-                      totalFatura.transacoes?.map((transacao, index) => (
+                    {totalFatura.modoInserir ? (<CardTransacaoInserir totalFatura={totalFatura} />) :
+                      (<>
+                        {totalFatura.transacoes && (
+                          totalFatura.transacoes?.map((transacao, index) => (
 
-                        <div key={index}>
-                          {transacao.editando ? (
-                            <CardTransacaoEditar
+                            <div key={index}>
+                              {transacao.editando ? (
+                                <CardTransacaoEditar
+                                  transacao={transacao}
+                                />
+                              ) : <CardTransacao
 
-                              transacao={transacao}
-                            />
-                          ) : <CardTransacao
+                                transacao={transacao}
+                                faturaAtual={totalFatura.atual}
+                                faturaFechada={totalFatura.fechada}
+                              />
+                              }
+                            </div>
 
-                            transacao={transacao}
-                            faturaAtual={totalFatura.atual}
-                            faturaFechada={totalFatura.fechada}
-                          />
-                          }
-                        </div>
+                          ))
+                        )}
+                      </>)}
 
-                      ))
-                    )}
 
                   </Conteudo>
                 </ConteudoTransacao>

@@ -21,9 +21,11 @@ interface TransacoesContextData {
   atualizarTransacoesTotalFatura: (transacoesTotalFatura: ITotalFatura[]) => void;
   atualizarTransacoesPorTotalFatura: (transacaoPorTotalFatura: ITotalFatura) => void;
   atualizarTransacoesPorTotalFaturaSnapshot: (totalFaturaID: string) => void;
-  excluirTransacao: (idFatura: string, idTransacao: string) => void;
+  modoInserir: (totalFatura: ITotalFatura) => void;
+  cancelarInserir: (totalFatura: ITotalFatura) => void;
   modoEdicao: (transacao: ITransacao) => void;
   atualizarTransacao: (transacao: ITransacao) => void;
+  excluirTransacao: (idFatura: string, idTransacao: string) => void;
   transacoesTotalFatura: ITotalFatura[];
   loading: boolean;
 }
@@ -45,7 +47,7 @@ export function TransacoesProvider({ children }: TransacaoProviderProps) {
       setLoading(true);
       const ids = faturasSelecionadas.map(fs => fs.id);
       const response = await api.post<ITotalFatura[]>("/api/transacao/TransacoesPorFaturas", ids);
-      //setTransacoesTotalFatura(response.data);
+
       setTransacoesTotalFaturaSnapshot(response.data);
       setLoading(false);
 
@@ -94,6 +96,72 @@ export function TransacoesProvider({ children }: TransacaoProviderProps) {
 
     setTransacoesTotalFatura(arrayClonado);
     GravarDadosLocalStorage(arrayClonado, 'totalFatura');
+  }
+
+  const modoInserir = (totalFatura: ITotalFatura) => {
+
+    totalFatura.modoInserir = true;
+
+    const totalFaturasClonado = substituirTotalFatura(totalFatura);
+
+    GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
+    setTransacoesTotalFatura(totalFaturasClonado);
+  }
+
+  const cancelarInserir = (totalFatura: ITotalFatura) => {
+    totalFatura.modoInserir = false;
+    const totalFaturasClonado = substituirTotalFatura(totalFatura);
+
+    GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
+    setTransacoesTotalFatura(totalFaturasClonado);
+  }
+
+  const modoEdicao = (transacao: ITransacao) => {
+    transacao.editando = !transacao.editando;
+
+    const totalFaturaClonado = substituirTransacao(transacao);
+    const totalFaturasClonado = substituirTotalFatura(totalFaturaClonado);
+
+    GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
+    setTransacoesTotalFatura(totalFaturasClonado);
+  }
+
+  function substituirTransacao(transacao: ITransacao) {
+
+    let totalFaturasClonado = Object.values(transacoesTotalFatura);
+    const totalFaturaClonado = totalFaturasClonado.filter(t => t.id === transacao.faturaId)[0];
+    if (totalFaturaClonado) {
+
+      const transacaoClonada = totalFaturaClonado.transacoes.filter(t => t.id === transacao.id)[0];
+      if (transacaoClonada) {
+
+        const indiceTransacao = totalFaturaClonado.transacoes.indexOf(transacaoClonada);
+        if (indiceTransacao > -1) {
+          totalFaturaClonado.transacoes.splice(indiceTransacao, 1, transacao);
+        }
+      }
+    }
+    return totalFaturaClonado;
+  }
+
+  function substituirTotalFatura(totalFaturaClonado: ITotalFatura) {
+    let totalFaturasClonado = Object.values(transacoesTotalFatura);
+    const indiceTotalFatura = totalFaturasClonado.indexOf(totalFaturaClonado);
+    if (indiceTotalFatura > -1)
+      totalFaturasClonado.splice(indiceTotalFatura, 1, totalFaturaClonado);
+
+    return totalFaturasClonado;
+  }
+
+  const atualizarTransacao = async (transacao: ITransacao) => {
+    transacao.editando = false;
+    await api.put<ITotalFatura[]>(`/api/transacao/${transacao.id}`, { ...transacao });
+
+    const totalFaturaClonado = substituirTransacao(transacao);
+    const totalFaturasClonado = substituirTotalFatura(totalFaturaClonado);
+
+    GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
+    setTransacoesTotalFatura(totalFaturasClonado);
   }
 
   const excluirTransacao = async (idFatura: string, idTransacao: string) => {
@@ -167,55 +235,7 @@ export function TransacoesProvider({ children }: TransacaoProviderProps) {
     }
   }
 
-  const modoEdicao = (transacao: ITransacao) => {
-    transacao.editando = !transacao.editando;
 
-    const totalFaturaClonado = substituirTransacao(transacao);
-    const totalFaturasClonado = substituirTotalFatura(totalFaturaClonado);
-
-    GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
-    setTransacoesTotalFatura(totalFaturasClonado);
-  }
-
-  function substituirTransacao(transacao: ITransacao) {
-
-    let totalFaturasClonado = Object.values(transacoesTotalFatura);
-    const totalFaturaClonado = totalFaturasClonado.filter(t => t.id === transacao.faturaId)[0];
-    if (totalFaturaClonado) {
-
-      const transacaoClonada = totalFaturaClonado.transacoes.filter(t => t.id === transacao.id)[0];
-      if (transacaoClonada) {
-
-        const indiceTransacao = totalFaturaClonado.transacoes.indexOf(transacaoClonada);
-        if (indiceTransacao > -1) {
-          totalFaturaClonado.transacoes.splice(indiceTransacao, 1, transacao);
-        }
-      }
-    }
-    return totalFaturaClonado;
-  }
-
-  function substituirTotalFatura(totalFaturaClonado: ITotalFatura) {
-    let totalFaturasClonado = Object.values(transacoesTotalFatura);
-    const indiceTotalFatura = totalFaturasClonado.indexOf(totalFaturaClonado);
-    if (indiceTotalFatura > -1)
-      totalFaturasClonado.splice(indiceTotalFatura, 1);
-
-    totalFaturasClonado.push(totalFaturaClonado);
-    totalFaturasClonado.sort(Ordenar);
-    return totalFaturasClonado;
-  }
-
-  const atualizarTransacao = async (transacao: ITransacao) => {
-    transacao.editando = false;
-    await api.put<ITotalFatura[]>(`/api/transacao/${transacao.id}`, { ...transacao });
-
-    const totalFaturaClonado = substituirTransacao(transacao);
-    const totalFaturasClonado = substituirTotalFatura(totalFaturaClonado);
-
-    GravarDadosLocalStorage(totalFaturasClonado, 'totalFatura');
-    setTransacoesTotalFatura(totalFaturasClonado);
-  }
 
   return (
     <TransacoesContext.Provider
@@ -224,9 +244,11 @@ export function TransacoesProvider({ children }: TransacaoProviderProps) {
         atualizarTransacoesTotalFatura,
         atualizarTransacoesPorTotalFatura,
         atualizarTransacoesPorTotalFaturaSnapshot,
-        excluirTransacao,
+        modoInserir,
+        cancelarInserir,
         modoEdicao,
         atualizarTransacao,
+        excluirTransacao,
         transacoesTotalFatura,
         loading
       }}
