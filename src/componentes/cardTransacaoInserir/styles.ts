@@ -36,7 +36,6 @@ export const Grid = styled.div`
 
           input {
             margin-top: 0.3rem;
-            //width: 70%;
             height: 2rem;
             border-radius: 0.25rem;
             border: none;
@@ -63,7 +62,6 @@ export const Grid = styled.div`
             height: 2rem;
             padding: 0.5rem;
             background: var(--border-botton);
-            //color: var(--border-botton);
             border-radius: 0.2rem;
             border: 0.1rem solid var(--text-body);
             font-size: 0.7rem;

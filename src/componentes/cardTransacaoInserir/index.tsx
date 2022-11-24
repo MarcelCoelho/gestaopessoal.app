@@ -3,10 +3,13 @@ import { Container, Grid, CssTextField } from './styles';
 import DatePicker from 'react-datepicker';
 import { registerLocale } from 'react-datepicker';
 import pt from 'date-fns/locale/pt';
+
 import { IFatura, ITipoPagamento, ITotalFatura, ITransacao } from '../../tipos';
 import { useTransacoes } from '../../hooks/useTransacoes';
 import { FormEvent, useEffect, useState } from 'react';
 import { RecuperarDadosLocalStorage } from '../../Servicos/utilidades';
+import { Loading } from "../loading";
+
 registerLocale('pt', pt);
 
 interface CardTransacaoInserirProps {
@@ -16,6 +19,8 @@ interface CardTransacaoInserirProps {
 export function CardTransacaoInserir({ totalFatura }: CardTransacaoInserirProps) {
 
   const { gravarTransacao, cancelarInserir } = useTransacoes();
+
+  const [loading, setLoading] = useState(false);
 
   const [data, setData] = useState(new Date());
   const [produto, setProduto] = useState("");
@@ -45,11 +50,18 @@ export function CardTransacaoInserir({ totalFatura }: CardTransacaoInserirProps)
 
   }, [])
 
-  const handleGravarTransacao = (event: FormEvent) => {
+  const handleGravarTransacao = async (event: FormEvent) => {
     event.preventDefault();
 
-    const transacao = CriarTransacao();
-    gravarTransacao(transacao, totalFatura);
+    try {
+      setLoading(true);
+      const transacao = CriarTransacao();
+      gravarTransacao(transacao, totalFatura);
+      setLoading(false);
+    }
+    catch (error) {
+      setLoading(false);
+    }
   }
 
   function CriarTransacao() {
@@ -110,7 +122,7 @@ export function CardTransacaoInserir({ totalFatura }: CardTransacaoInserirProps)
   function criarTipoPagamentoVazio() {
     const tipoPagamento: ITipoPagamento = {
       id: "",
-      descricao: "",
+      descricao: tipoPagamentoId,
       codigo: "",
       observacao: ""
     };
@@ -126,93 +138,101 @@ export function CardTransacaoInserir({ totalFatura }: CardTransacaoInserirProps)
   };
 
   return (
-    <Container>
-      <Grid>
-        <form onSubmit={handleGravarTransacao}>
-          <div className='corpoFormulario'>
-            <div className='campos'>
-              <div className='dataPicker'>
-                <DatePicker
-                  placeholderText="Data"
-                  locale="pt"
-                  selected={new Date(data)}
-                  onChange={(date: Date) => setData(new Date(date))}
-                  dateFormat="dd/MM/yyyy">
-                </DatePicker>
-              </div>
+    <>
+      {loading ? (
+        <Loading descricao={"Aguarde. Gravando Transação..."} />
+      ) : (
+        <>
+          <Container>
+            <Grid>
+              <form onSubmit={handleGravarTransacao}>
+                <div className='corpoFormulario'>
+                  <div className='campos'>
+                    <div className='dataPicker'>
+                      <DatePicker
+                        placeholderText="Data"
+                        locale="pt"
+                        selected={new Date(data)}
+                        onChange={(date: Date) => setData(new Date(date))}
+                        dateFormat="dd/MM/yyyy">
+                      </DatePicker>
+                    </div>
 
-              <input
-                placeholder="Produto"
-                value={produto}
-                onChange={(event) => setProduto(event.target.value)}
-              ></input>
+                    <input
+                      placeholder="Produto"
+                      value={produto}
+                      onChange={(event) => setProduto(event.target.value)}
+                    ></input>
 
-              <input
-                placeholder="Loja"
-                value={loja}
-                onChange={(event) => setLoja(event.target.value)}
-              ></input>
+                    <input
+                      placeholder="Loja"
+                      value={loja}
+                      onChange={(event) => setLoja(event.target.value)}
+                    ></input>
 
-              <input
-                placeholder="Local"
-                value={local}
-                onChange={(event) => setLocal(event.target.value)}
-              ></input>
+                    <input
+                      placeholder="Local"
+                      value={local}
+                      onChange={(event) => setLocal(event.target.value)}
+                    ></input>
 
-              <input
-                placeholder="N. Parcela"
-                type='text'
-                value={numeroParcela}
-                onChange={(event) => setNumeroParcela(Number(event.target.value))}
-              ></input>
+                    <input
+                      placeholder="N. Parcela"
+                      type='text'
+                      value={numeroParcela}
+                      onChange={(event) => setNumeroParcela(Number(event.target.value))}
+                    ></input>
 
-              <input
-                placeholder="Qnt. Parcela"
-                type="text"
-                value={quantidadeParcelas}
-                onChange={(event) => setQuantidadeParcelas(Number(event.target.value))}
-              ></input>
+                    <input
+                      placeholder="Qnt. Parcela"
+                      type="text"
+                      value={quantidadeParcelas}
+                      onChange={(event) => setQuantidadeParcelas(Number(event.target.value))}
+                    ></input>
 
-              <input
-                placeholder="Valor"
-                value={valor}
-                onChange={(event) => setValor(event.target.value)}
-              ></input>
+                    <input
+                      placeholder="Valor"
+                      value={valor}
+                      onChange={(event) => setValor(event.target.value)}
+                    ></input>
 
-              <input
-                placeholder="Observação"
-                value={observacao}
-                onChange={(event) => setObservacao(event.target.value)}
-              ></input>
+                    <input
+                      placeholder="Observação"
+                      value={observacao}
+                      onChange={(event) => setObservacao(event.target.value)}
+                    ></input>
 
-              <div className='tiposPagamento'>
-                <CssTextField
+                    <div className='tiposPagamento'>
+                      <CssTextField
 
-                  id="outlined-select-currency-native"
-                  select
-                  label="Tipo de Pagamento"
-                  value={tipoPagamentoId}
-                  onChange={handleTipoPagamentoSelecionado}
-                  SelectProps={{
-                    native: true,
-                  }}
-                >
-                  {listaTiposPagamento.map((tipoPagamento) => (
-                    <option key={tipoPagamento} value={tipoPagamento}>
-                      {tipoPagamento}
-                    </option>
-                  ))}
-                </CssTextField>
-              </div>
-            </div>
-            <div className="botoes">
-              <button type="button" onClick={handleCancelarInserir}>Cancelar</button>
-              <button type="submit">Gravar Transação</button>
-            </div>
-          </div>
-          {/*<FiX size={18} onClick={handleCancelarInserir} />*/}
-        </form>
-      </Grid>
-    </Container>)
+                        id="outlined-select-currency-native"
+                        select
+                        label="Tipo de Pagamento"
+                        value={tipoPagamentoId}
+                        onChange={handleTipoPagamentoSelecionado}
+                        SelectProps={{
+                          native: true,
+                        }}
+                      >
+                        {listaTiposPagamento.map((tipoPagamento) => (
+                          <option key={tipoPagamento} value={tipoPagamento}>
+                            {tipoPagamento}
+                          </option>
+                        ))}
+                      </CssTextField>
+                    </div>
+                  </div>
+                  <div className="botoes">
+                    <button type="button" onClick={handleCancelarInserir}>Cancelar</button>
+                    <button type="submit">Gravar Transação</button>
+                  </div>
+                </div>
+                {/*<FiX size={18} onClick={handleCancelarInserir} />*/}
+              </form>
+            </Grid>
+          </Container>
+        </>
+      )}
+    </>)
 
 }
