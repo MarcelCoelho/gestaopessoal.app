@@ -9,7 +9,12 @@ function App() {
 
   return (
     <>
+      <GlobalStyle />
       <div className={styles.conteudo}>
+
+        <header className={styles.header}>
+          <span>HEADER</span>
+        </header>
 
         <main className={styles.main}>
           <div className={styles.grid}>
@@ -23,8 +28,9 @@ function App() {
             <img src="/favicon.png" alt="logo" width={16} height={16} />
           </span>
         </footer>
+
       </div>
-      <GlobalStyle />
+
     </>
   );
 }

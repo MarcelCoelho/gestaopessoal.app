@@ -63,7 +63,7 @@ export function TotalFatura() {
     <>
       <Container>
         {carregando ? (
-          <Loading descricao={"Aguarde. Carregando Faturas..."} />
+          <Loading descricao={"Aguarde. Carregando Faturas..."} tamanho={1.5} />
         ) : (
           <>
             <Cabecalho>

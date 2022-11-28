@@ -10,6 +10,7 @@ import { Ordenar, GravarDadosLocalStorage } from "../../Servicos/utilidades";
 import { CardTransacaoEditar } from "../cardTransacaoEditar";
 import { useTransacoes } from "../../hooks/useTransacoes";
 import { CardTransacaoInserir } from "../cardTransacaoInserir";
+import { FiltroTransacaoPorFatura } from "../filtroTransacaoPorFatura";
 
 interface IVisibilidadeTotalFatura {
   faturaID: string;
@@ -159,23 +160,25 @@ export function Transacao() {
   }
 
   return (
-    <>
+
+    <Container>
       {loading ? (
-        <Loading descricao={"Aguarde. Carregando Transacações..."} />
+        <Loading descricao={"Aguarde. Carregando Transacações..."} tamanho={1.5} />
       ) : (
         <>
-          <Container>
-            {totalFatura && (
-              totalFatura.map((totalFatura, index) => (
 
-                <ConteudoTransacao
-                  key={index}
-                  id={"container_" + totalFatura.id}
-                  faturaAtual={totalFatura.atual}
-                  faturaFechada={totalFatura.fechada}
-                  style={{ height: "4.5rem" }}>
-                  <Cabecalho id={totalFatura.id} >
-                    <>
+          {totalFatura && (
+            totalFatura.map((totalFatura, index) => (
+
+              <ConteudoTransacao
+                key={index}
+                id={"container_" + totalFatura.id}
+                faturaAtual={totalFatura.atual}
+                faturaFechada={totalFatura.fechada}
+                style={{ height: "4.5rem" }}>
+                <Cabecalho id={totalFatura.id} >
+                  <>
+                    <div className="titulo">
                       <div className="expandirTransacoes" onClick={() => { handleAlterarEstadoVisibilidadeTransacoes(totalFatura.id) }}>
                         {totalFatura.transacoesVisiveis ? (
                           <FiChevronDown size={16} />
@@ -220,45 +223,54 @@ export function Transacao() {
                       {!totalFatura.modoInserir && totalFatura.transacoesVisiveis && (
                         <Pesquisar totalFatura={totalFatura} />
                       )}
-                    </>
-                  </Cabecalho>
+                    </div>
+                    <div className="filtro">
+                      {!totalFatura.modoInserir && totalFatura.transacoesVisiveis && (
+                        <>
+                          <FiltroTransacaoPorFatura totalFaturaID={totalFatura.id} />
+                        </>
+                      )}
+                    </div>
+                  </>
+                </Cabecalho>
 
-                  <Conteudo id={"conteudo_" + totalFatura.id} key={totalFatura.id} style={{ visibility: "hidden" }}>
+                <Conteudo id={"conteudo_" + totalFatura.id} key={totalFatura.id} style={{ visibility: "hidden" }}>
 
-                    {totalFatura.modoInserir ? (<CardTransacaoInserir totalFatura={totalFatura} />) :
-                      (<>
-                        {totalFatura.transacoes && (
-                          totalFatura.transacoes?.map((transacao, index) => (
+                  {totalFatura.modoInserir ? (<CardTransacaoInserir totalFatura={totalFatura} />) :
+                    (<>
+                      {totalFatura.transacoes && (
+                        totalFatura.transacoes?.map((transacao, index) => (
 
-                            <div key={index}>
-                              {transacao.editando ? (
-                                <CardTransacaoEditar
-                                  transacao={transacao}
-                                />
-                              ) : <CardTransacao
-
+                          <div key={index}>
+                            {transacao.editando ? (
+                              <CardTransacaoEditar
                                 transacao={transacao}
-                                faturaAtual={totalFatura.atual}
-                                faturaFechada={totalFatura.fechada}
                               />
-                              }
-                            </div>
+                            ) : <CardTransacao
 
-                          ))
-                        )}
-                      </>)}
+                              transacao={transacao}
+                              faturaAtual={totalFatura.atual}
+                              faturaFechada={totalFatura.fechada}
+                            />
+                            }
+                          </div>
+
+                        ))
+                      )}
+                    </>)}
 
 
-                  </Conteudo>
-                </ConteudoTransacao>
-              )))}
+                </Conteudo>
+              </ConteudoTransacao>
+            )))}
 
-            {/* <NovaTransacao>
+          {/* <NovaTransacao>
               <TotalFaturaNaoSelecionada />
                       </NovaTransacao>*/}
-          </Container>
+
         </>
       )}
-    </>
+
+    </Container>
   )
 }

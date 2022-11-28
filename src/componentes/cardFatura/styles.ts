@@ -7,25 +7,26 @@ interface ComponentProps {
 }
 
 export const Container = styled.div<ComponentProps>`
-  margin: 1rem;
-  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  
+  margin: 0.65rem;
+  padding: 0.2rem;
   
   color: inherit;
   text-decoration: none;
   border: 1px solid #eaeaea;
   border-radius: 10px;
-  transition: color 0.15s ease, border - color 0.15s ease;
+  
   width: 10rem;
-  height: 8rem;
-  
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
+  height: 8rem;  
+ 
+  cursor: pointer; 
 
-  display: flex;
-  flex-direction: column;
+  transition: color 0.15s ease, border - color 0.15s ease;
 
-  
   border-color: ${(props) => props.ativo ? "var(--black)" : (props.fechada ? "var(--red-tomato)" : (props.atual ? "var(--green-light)" : "var(--cinza)"))};
   background-color:  ${(props) => props.ativo && props.fechada ? "var(--red-tomato)" : props.ativo && props.atual ? "var(--green-light)" : props.ativo && !props.atual && !props.fechada ? "var(--cinza)" : ""};
   
@@ -38,14 +39,14 @@ export const Container = styled.div<ComponentProps>`
 
   h3 {
     margin: 0 0 1rem 0;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: normal
   }
 
   p{
     margin: 0;
-    font-size: 1.25rem;
-    line-height: 1.5;
+    font-size: 1.1rem;
+    line-height: 1;
     font-weight: bold;
   }
 

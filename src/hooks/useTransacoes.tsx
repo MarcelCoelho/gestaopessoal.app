@@ -28,6 +28,7 @@ interface TransacoesContextData {
   atualizarTransacao: (transacao: ITransacao) => void;
   excluirTransacao: (idFatura: string, idTransacao: string) => void;
   transacoesTotalFatura: ITotalFatura[];
+  transacoesTotalFaturaSnapshot: ITotalFatura[];
   loading: boolean;
 }
 
@@ -308,6 +309,7 @@ export function TransacoesProvider({ children }: TransacaoProviderProps) {
         atualizarTransacao,
         excluirTransacao,
         transacoesTotalFatura,
+        transacoesTotalFaturaSnapshot,
         loading
       }}
     >

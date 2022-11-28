@@ -7,8 +7,7 @@ export const Container = styled.div`
   justify-content: center;
   align-items: center;
 
-  border-radius: 0.4rem;
-  
+  border-radius: 0.4rem; 
 
   background: var(--fundoCard);
 `;
@@ -16,7 +15,7 @@ export const Container = styled.div`
 export const Cabecalho = styled.div`
   display: flex;
   
-  height: 70px;
+  height: 4rem;
   width: 100%;
 
   justify-content: space-between;
@@ -81,7 +80,7 @@ export const Faturas = styled.div`
 
 export const Rodape = styled.div`
   display: flex;
-  height: 5rem;
+  height: 3rem;
   justify-content: center;
   align-items: center;
   margin-top: 0.5rem;

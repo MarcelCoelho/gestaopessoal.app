@@ -1,6 +1,10 @@
 import styled from "styled-components";
 
-export const Container = styled.div`
+interface ContainerProps {
+  tamanho: number;
+}
+
+export const Container = styled.div<ContainerProps>`
     display: flex;
     flex-direction: column;
     margin: 0 auto;
@@ -9,10 +13,14 @@ export const Container = styled.div`
 
     align-items: center;
 
+  .reactloading {
+    font-size: ${(props) => props.tamanho + "rem"};
+  }
+
     span {
       margin: 2rem;
       padding: 1rem;
-      font-size: 1.5rem;
-      color: var(--text-title);
+      font-size: ${(props) => props.tamanho + "rem"};
+      color: var(--text-title);      
     }
 `;

@@ -6,7 +6,7 @@ import {
   useContext,
 } from "react";
 import { api } from "../Servicos/api";
-import { GravarDadosLocalStorage, RecuperarDadosLocalStorage, RemoverDadosLocalStorage } from '../Servicos/utilidades';
+import { BuscarListaTiposPagamento, GravarDadosLocalStorage, RecuperarDadosLocalStorage, RemoverDadosLocalStorage } from '../Servicos/utilidades';
 import { ITipoPagamento, ITotalFatura } from '../tipos';
 
 interface TotalFaturaProviderProps {
@@ -36,20 +36,9 @@ export function TotalFaturaProvider({ children }: TotalFaturaProviderProps) {
     atualizarTiposPagamentoComLocalStorage();
   }, []);
 
-
   const atualizarTiposPagamentoComLocalStorage = async () => {
-    const tiposPagamentos = await buscarListaTiposPagamento();
+    const tiposPagamentos = await BuscarListaTiposPagamento();
     GravarDadosLocalStorage(tiposPagamentos, 'tiposPagamento');
-  }
-
-  const buscarListaTiposPagamento = async () => {
-
-    const tiposPagamentoLocalStorage = RecuperarDadosLocalStorage<ITipoPagamento[]>('tiposPagamento');
-    if (tiposPagamentoLocalStorage && tiposPagamentoLocalStorage.length > 0)
-      return tiposPagamentoLocalStorage;
-
-    const response = await api.get<ITipoPagamento[]>("/api/TipoPagamento");
-    return response.data;
   }
 
   const atualizarFaturasSelecionadasComLocalStorage = () => {

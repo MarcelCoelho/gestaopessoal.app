@@ -23,7 +23,7 @@ export const GlobalStyle = createGlobalStyle`
   * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
+    box-sizing: border-box;    
   }
 
  // padrão font aplicação 16px (ideal Desktop);
@@ -34,12 +34,11 @@ export const GlobalStyle = createGlobalStyle`
 
    @media (max-width: 920px) {
      font-size: 87.5%; // 14px    
-    
     }
  }
 
-  body {
-    padding: 0 2rem;
+  body {   
+    overflow: hidden;
     background: var(--background);
     -webkit-font-smoothing: antialiased;
   }
@@ -63,4 +62,16 @@ export const GlobalStyle = createGlobalStyle`
   cursor: not-allowed;
 }
 
+body::-webkit-scrollbar {
+  width: 1rem;               /* width of the entire scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+  background: var(--shape);        /* color of the tracking area */
+}
+
+body::-webkit-scrollbar-thumb {
+  background-color: var(--blue);    /* color of the scroll thumb */  
+  border: 0.1rem solid orange;  /* creates padding around scroll thumb */
+}
 `;

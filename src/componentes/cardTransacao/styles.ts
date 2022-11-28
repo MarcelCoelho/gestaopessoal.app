@@ -14,7 +14,7 @@ export const Grid = styled.div<Props>`
     display: flex;
     flex-direction: row;
 
-    width: 60rem;
+    //width: 60rem;
     height: 5rem;
 
     border-radius: 0.4rem;

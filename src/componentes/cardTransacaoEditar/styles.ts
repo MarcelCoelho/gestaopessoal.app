@@ -7,16 +7,15 @@ export const Container = styled.div`
 export const Grid = styled.div`
     display: flex;
     flex-direction: row;
-    justify-content: space-between;
-
-    width: 60rem;
+    justify-content: flex-start;
+    
+    //width: 100%;
     height: 5rem;
 
     border-radius: 0.4rem;
     
-    padding: 0.8rem;
+    padding: 1.3rem;
     background: var(--shape);
-    
 
     form {
         font-size: 0.7rem;        
@@ -34,7 +33,7 @@ export const Grid = styled.div`
           width: 8rem;    
           flex-wrap: wrap;
           padding: 0.1rem;
-          height: 3rem;
+          height: 2rem;
           border-radius: 0.25rem;
           border: none;
           border: 0.1rem solid var(--border-botton);
@@ -78,14 +77,15 @@ export const Grid = styled.div`
         button[type="submit"] {
           width: 100%;
           padding: 0.5rem;
-          height: 3rem;
+          height: 2rem;
+          margin-left: 2rem;
           background: var(--green);
           
           border-radius: 0.25rem;
           border: none;
           
           font-size: 0.8rem;
-          transition: filter 0.2s;
+          transition: filter 0.2s;          
 
           &:hover {
             filter: brightness(0.8);
